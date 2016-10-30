@@ -43,6 +43,7 @@ class CAFConan(ConanFile):
         self.copy("*.hpp",   dst="include/caf", src="%s/libcaf_core/caf" % self.source_dir)
         self.copy("*.hpp",   dst="include/caf", src="%s/libcaf_io/caf" % self.source_dir)
         self.copy("*.dylib", dst="lib",         src="%s/build/lib" % self.source_dir)
+        self.copy("*.so",    dst="lib",         src="%s/build/lib" % self.source_dir)
         self.copy("*.a",     dst="lib",         src="%s/build/lib" % self.source_dir)
 
     def package_info(self):
