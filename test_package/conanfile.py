@@ -9,7 +9,7 @@ import os
 
 
 class CAFReuseConan(ConanFile):
-    version = '0.15.1'
+    version = '0.15.2'
 
     username = 'sourcedelica' # FIXME
     channel = 'testing'       # FIXME

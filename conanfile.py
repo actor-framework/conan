@@ -7,7 +7,7 @@ from conans.errors import ConanException
 
 
 class CAFConan(ConanFile):
-    version = '0.15.1'
+    version = '0.15.2'
 
     name = "caf"
     url = "https://github.com/sourcedelica/conan-recipes/tree/master/caf"

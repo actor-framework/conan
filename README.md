@@ -37,9 +37,6 @@ The syntax for `conan test_package` is
 ```
 conan test_package [-o caf:option=value]...
 ```
-where _version_ is the new version number, _user_ is the `conan.io` user 
-that your packages live under, and _channel_ is one of `testing`, `beta`,
-`development`, `stable`, etc. 
 
 `conan test_package` will build CAF and install the package in your local 
 Conan repository under `~/.conan/data`.  It will also run a smoke test 
