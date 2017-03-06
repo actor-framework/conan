@@ -1,4 +1,4 @@
-# [Conan](http://conan.io) recipe for CAF
+# [Conan](http://conan.io) recipe for [CAF](http://actor-framework.org)
 
 ## Setup
 
@@ -27,7 +27,38 @@ value of `--with-default-libstdcxx-abi`:
 
 You may need to run the `conan` command once to generate it.
 
-## Building a new version of the package
+## Usage
+
+Add a requirement for `caf/version@sourcedelica/testing`
+to your `conanfile.txt` or `conanfile.py`.
+
+Check `conanfile.py` in this repo for the _version_.  It is
+the first attribute in the class definition:
+```
+class CAFConan(ConanFile):
+    version = '2.5.0'
+```
+
+## Build Options
+
+Supported options are:
+
+|Option     |Values                             |Default  |Description             |
+|:----------|:----------------------------------|:--------|:-----------------------|
+|`shared`   |`True`, `False`                    | `False` | Build shared libraries (static always built) |
+|`log_level`|`ERROR`, `WARNING`, `INFO`, `DEBUG`| None    | Build with logging     |
+
+For example, to build with shared libraries and debug logging, use:
+```
+conan test_package -o caf:shared=True -o caf:log_level=DEBUG
+```
+
+Conan keeps track of the option values used and each built combination of
+options is a different package.
+
+## Development
+
+### Building a new version of the package
 
 1. Edit `conanfile.py` and `test_package/conanfile.py` and change the
    `version` attribute to the new version number.
@@ -42,24 +73,8 @@ conan test_package [-o caf:option=value]...
 Conan repository under `~/.conan/data`.  It will also run a smoke test 
 against the package.
 
-### Build Options
 
-Supported options are:
- 
-|Option     |Values                             |Default  |Description             | 
-|:----------|:----------------------------------|:--------|:-----------------------|
-|`shared`   |`True`, `False`                    | `False` | Build shared libraries (static always built) |
-|`log_level`|`ERROR`, `WARNING`, `INFO`, `DEBUG`| None    | Build with logging     |
-
-For example, to build with shared libraries and debug logging, use:
-```
-conan test_package -o caf:shared=True -o caf:log_level=DEBUG
-```
-
-Conan keeps track of the option values used and each built combination of
-options is a different package.
-
-## Uploading built packages to `conan.io`
+### Uploading built packages to `conan.io`
 ```
 conan upload --all caf/version@user/channel
 ```
