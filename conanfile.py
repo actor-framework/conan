@@ -2,8 +2,12 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+import os
+import sys
 from conans import ConanFile
 from conans.errors import ConanException
+
+# TODO - change Travis and Appveyor config to conan-center
 
 
 class CAFConan(ConanFile):
@@ -15,33 +19,41 @@ class CAFConan(ConanFile):
     license = "BSD-3-Clause"
 
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]}
-    default_options = "shared=False", "log_level=NONE"
+    options = {"shared": [True, False], "static": [True, False],
+               "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]}
+    default_options = "shared=False", "static=True", "log_level=NONE"
     source_dir = "actor-framework"
 
     def configure(self):
-        if self.settings.compiler == "gcc" and self.settings.compiler.version < "4.8":
-            raise ConanException("g++ >= 4.8 is required")
-        else:
-            if self.settings.compiler.libcxx != 'libstdc++11':
+        if self.settings.compiler == "gcc":
+            if self.settings.compiler.version < "4.8":
+                raise ConanException("g++ >= 4.8 is required")
+            elif self.settings.compiler.libcxx != 'libstdc++11':
                 raise ConanException("You must use the setting compiler.libcxx=libstdc++11")
         if self.settings.compiler == "clang" and self.settings.compiler.version < "3.4":
             raise ConanException("g++ >= 3.4 is required")
         if self.settings.compiler == "Visual Studio" and self.settings.compiler.version < "14":
             raise ConanException("Visual Studio >= 14 is required")
+        if not (self.options.shared or self.options.static):
+            raise ConanException("You must use at least one of shared=True or static=True")
 
     def source(self):
         self.run_command("git clone https://github.com/actor-framework/actor-framework.git")
         self.run_command("git checkout -b %s.x %s" % (self.version, self.version), self.source_dir)
 
     def build(self):
-        static_suffix = "" if self.options.shared else "-only"
-        logging = "--with-log-level=%s" % self.options.log_level if self.options.log_level != "NONE" else ""
-        configure = \
-            "./configure --no-python --no-examples --no-opencl --no-tools --no-unit-tests --build-static%s %s" % \
-            (static_suffix, logging)
-        self.run_command("%s" % configure, self.source_dir)
-        self.run_command("make", self.source_dir)
+        lib_type = ""
+        build_dir = "%s/build" % self.source_dir
+        os.mkdir(build_dir)
+        if self.options.static:
+            lib_type = "-DCAF_BUILD_STATIC=ON" if self.options.shared else "-DCAF_BUILD_STATIC_ONLY=ON"
+        logging = "-DCAF_LOG_LEVEL=%s" % self.options.log_level if self.options.log_level != "NONE" else ""
+        skip_rpath = '-DCMAKE_SKIP_RPATH=ON' if sys.platform == 'darwin' else ''
+        standard_options = \
+            "-DCAF_NO_EXAMPLES=ON -DCAF_NO_OPENCL=ON -DCAF_NO_TOOLS=ON -DCAF_NO_UNIT_TESTS=ON -DCAF_NO_PYTHON=ON"
+        configure = 'cmake .. %s %s %s %s' % (standard_options, skip_rpath, lib_type, logging)
+        self.run_command(configure, build_dir)
+        self.run_command('make', build_dir)
 
     def run_command(self, cmd, cwd=None):
         self.output.info(cmd)
@@ -56,4 +68,8 @@ class CAFConan(ConanFile):
         self.copy("license*", dst="licenses", ignore_case=True, keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = ["caf_io_static", "caf_core_static"]
+        self.cpp_info.libs = []
+        if self.options.shared:
+            self.cpp_info.libs.extend(["caf_core", "caf_io"])
+        if self.options.static:
+            self.cpp_info.libs.extend(["caf_core_static", "caf_io_static"])

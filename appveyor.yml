@@ -6,10 +6,11 @@ environment:
     PYTHON_ARCH: "32"
 
     CONAN_REFERENCE: "caf/0.15.3"
-    CONAN_USERNAME: "caf"
-    CONAN_LOGIN_USERNAME: "caf"
-    CONAN_CHANNEL: "stable"
+    CONAN_USERNAME: "sourcedelica"
+    CONAN_LOGIN_USERNAME: "sourcedelica"
+    CONAN_CHANNEL: "testing"
     VS150COMNTOOLS: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\"
+    CONAN_UPLOAD: "https://dl.bintray.com/sourcedelica/conan-caf"
     
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015

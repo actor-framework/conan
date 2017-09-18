@@ -45,7 +45,8 @@ Supported options are:
 
 |Option     |Values                             |Default  |Description             |
 |:----------|:----------------------------------|:--------|:-----------------------|
-|`shared`   |`True`, `False`                    | `False` | Build shared libraries (static always built) |
+|`shared`   |`True`, `False`                    | `False` | Build shared libraries |
+|`static`   |`True`, `False`                    | `True`  | Build static libraries |
 |`log_level`|`ERROR`, `WARNING`, `INFO`, `DEBUG`| None    | Build with logging     |
 
 For example, to build with shared libraries and debug logging, use:

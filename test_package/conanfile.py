@@ -4,15 +4,15 @@ except ImportError:
     from io import StringIO
 from conans import ConanFile, CMake
 from conans.errors import ConanException
-from conans.util.files import save
+import conans.util.files as files
 import os
 
 
 class CAFReuseConan(ConanFile):
     version = '0.15.3'
 
-    username = 'sourcedelica' # FIXME
-    channel = 'testing'       # FIXME
+    username = 'sourcedelica'
+    channel = 'testing'
     requires = "caf/%s@%s/%s" % (version, username, channel)
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
@@ -35,9 +35,13 @@ class CAFReuseConan(ConanFile):
         self.run("git remote add origin %s" % repo_url, True, tests_dir)
         self.run("git config core.sparseCheckout true", True, tests_dir)
         sparse_checkout = "%s/.git/info/sparse-checkout" % tests_dir
-        save(sparse_checkout, "libcaf_test\n")
-        save(sparse_checkout, "libcaf_io/test\n", True)
+        files.save(sparse_checkout, "libcaf_test\n")
+        files.save(sparse_checkout, "libcaf_io/test\n", True)
         self.run("git pull origin %s --depth 1" % self.version, True, tests_dir)
 
     def test(self):
-        self.run(os.sep.join([".", "bin", "caf-test"]))
+        self.run(os.path.join('.', 'caf-test'), True, 'bin')
+
+    def imports(self):
+      self.copy("*.dll", dst="bin", src="bin")
+      self.copy("*.dylib*", dst="bin", src="lib")
