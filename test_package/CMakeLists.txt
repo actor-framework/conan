@@ -14,6 +14,6 @@ add_executable(caf-test
              tests/libcaf_io/test/basp.cpp
              tests/libcaf_test/src/caf-test.cpp)
 
-target_include_directories(caf-test PUBLIC tests/libcaf_test)
+target_include_directories(caf-test PUBLIC tests/libcaf_test ${CONAN_INCLUDE_DIRS})
 
 target_link_libraries(caf-test ${CONAN_LIBS})

@@ -39,7 +39,7 @@ class CAFConan(ConanFile):
 
     def source(self):
         self.run_command("git clone https://github.com/actor-framework/actor-framework.git")
-        self.run_command("git checkout -b %s.x %s" % (self.version, self.version), self.source_dir)
+        self.run_command("git checkout %s" % self.version, self.source_dir)
 
     def build(self):
         lib_type = ""
