@@ -6,14 +6,14 @@ if(NOT APPLE AND NOT WIN32)
 endif()
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(TARGETS)
 
-set(CMAKE_CXX_FLAGS "-fPIC -std=c++11 ${EXTRA_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${EXTRA_FLAGS}")
 
 add_executable(caf-test
              tests/libcaf_io/test/basp.cpp
              tests/libcaf_test/src/caf-test.cpp)
 
-target_include_directories(caf-test PUBLIC tests/libcaf_test ${CONAN_INCLUDE_DIRS})
+target_include_directories(caf-test PUBLIC tests/libcaf_test)
 
-target_link_libraries(caf-test ${CONAN_LIBS})
+target_link_libraries(caf-test CONAN_PKG::caf)
