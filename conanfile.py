@@ -26,14 +26,14 @@ class CAFConan(ConanFile):
 
     def configure(self):
         if self.settings.compiler == "gcc":
-            if self.settings.compiler.version < "4.8":
-                raise ConanException("g++ >= 4.8 is required")
+            if str(self.settings.compiler.version) < "4.8":
+                raise ConanException("g++ >= 4.8 is required, yours is %s" % self.settings.compiler.version)
             elif self.settings.compiler.libcxx != 'libstdc++11':
                 raise ConanException("You must use the setting compiler.libcxx=libstdc++11")
-        if self.settings.compiler == "clang" and self.settings.compiler.version < "3.4":
-            raise ConanException("g++ >= 3.4 is required")
-        if self.settings.compiler == "Visual Studio" and self.settings.compiler.version < "14":
-            raise ConanException("Visual Studio >= 14 is required")
+        if self.settings.compiler == "clang" and str(self.settings.compiler.version) < "3.4":
+            raise ConanException("g++ >= 3.4 is required, yours is %s" % self.settings.compiler.version)
+        if self.settings.compiler == "Visual Studio" and str(self.settings.compiler.version) < "14":
+            raise ConanException("Visual Studio >= 14 is required, yours is %s" % self.settings.compiler.version)
         if not (self.options.shared or self.options.static):
             raise ConanException("You must use at least one of shared=True or static=True")
 
