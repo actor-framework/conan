@@ -8,6 +8,7 @@ from conans import ConanFile
 from conans.errors import ConanException
 
 # TODO - change Travis and Appveyor config to conan-center
+# TODO - ABI, actually CAF uses the *default* C++11 ABI.  Update the docs.
 
 
 class CAFConan(ConanFile):
@@ -26,12 +27,10 @@ class CAFConan(ConanFile):
 
     def configure(self):
         if self.settings.compiler == "gcc":
-            if str(self.settings.compiler.version) < "4.8":
+            if self.settings.compiler.version < 4.8:
                 raise ConanException("g++ >= 4.8 is required, yours is %s" % self.settings.compiler.version)
-            elif self.settings.compiler.libcxx != 'libstdc++11':
-                raise ConanException("You must use the setting compiler.libcxx=libstdc++11")
         if self.settings.compiler == "clang" and str(self.settings.compiler.version) < "3.4":
-            raise ConanException("g++ >= 3.4 is required, yours is %s" % self.settings.compiler.version)
+            raise ConanException("clang >= 3.4 is required, yours is %s" % self.settings.compiler.version)
         if self.settings.compiler == "Visual Studio" and str(self.settings.compiler.version) < "14":
             raise ConanException("Visual Studio >= 14 is required, yours is %s" % self.settings.compiler.version)
         if not (self.options.shared or self.options.static):
@@ -54,6 +53,7 @@ class CAFConan(ConanFile):
         configure = 'cmake .. %s %s %s %s' % (standard_options, skip_rpath, lib_type, logging)
         self.run_command(configure, build_dir)
         self.run_command('make', build_dir)
+        # TODO - Windows
 
     def run_command(self, cmd, cwd=None):
         self.output.info(cmd)
@@ -70,6 +70,6 @@ class CAFConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = []
         if self.options.shared:
-            self.cpp_info.libs.extend(["caf_core", "caf_io"])
+            self.cpp_info.libs.extend(["caf_io", "caf_core"])
         if self.options.static:
-            self.cpp_info.libs.extend(["caf_core_static", "caf_io_static"])
+            self.cpp_info.libs.extend(["caf_io_static", "caf_core_static"])

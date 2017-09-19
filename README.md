@@ -9,6 +9,36 @@
 pip install conan
 ```
 
+## Usage
+
+Add a requirement for `caf/version@sourcedelica/testing`
+to your `conanfile.txt` or `conanfile.py`.
+
+Check `conanfile.py` in this repo for the _version_.  It is
+the first attribute in the class definition:
+```
+class CAFConan(ConanFile):
+    version = '0.15.3'
+```
+
+### Build Options
+
+Supported options are:
+
+|Option     |Values                             |Default  |Description             |
+|:----------|:----------------------------------|:--------|:-----------------------|
+|`shared`   |`True`, `False`                    | `False` | Build shared libraries |
+|`static`   |`True`, `False`                    | `True`  | Build static libraries |
+|`log_level`|`ERROR`, `WARNING`, `INFO`, `DEBUG`| None    | Build with logging     |
+
+For example, to build with shared libraries and debug logging, use:
+```
+conan test_package -o caf:shared=True -o caf:log_level=DEBUG
+```
+
+Conan keeps track of the option values used and each built combination of
+options is a different package.
+
 ### GCC 5.1+
 
 CAF compiles with the default C++ ABI.
@@ -28,36 +58,6 @@ value of `--with-default-libstdcxx-abi`:
 | `old`     | `libstdc++`             |
 
 You may need to run the `conan` command once to generate it.
-
-## Usage
-
-Add a requirement for `caf/version@sourcedelica/testing`
-to your `conanfile.txt` or `conanfile.py`.
-
-Check `conanfile.py` in this repo for the _version_.  It is
-the first attribute in the class definition:
-```
-class CAFConan(ConanFile):
-    version = '2.5.0'
-```
-
-## Build Options
-
-Supported options are:
-
-|Option     |Values                             |Default  |Description             |
-|:----------|:----------------------------------|:--------|:-----------------------|
-|`shared`   |`True`, `False`                    | `False` | Build shared libraries |
-|`static`   |`True`, `False`                    | `True`  | Build static libraries |
-|`log_level`|`ERROR`, `WARNING`, `INFO`, `DEBUG`| None    | Build with logging     |
-
-For example, to build with shared libraries and debug logging, use:
-```
-conan test_package -o caf:shared=True -o caf:log_level=DEBUG
-```
-
-Conan keeps track of the option values used and each built combination of
-options is a different package.
 
 ## Development
 
