@@ -5,7 +5,7 @@ env:
      - CONAN_USERNAME: "sourcedelica"
      - CONAN_LOGIN_USERNAME: "sourcedelica"
      - CONAN_CHANNEL: "testing"
-     - CONAN_UPLOAD: "https://dl.bintray.com/sourcedelica/conan-caf"
+     - CONAN_UPLOAD: "https://api.bintray.com/conan/sourcedelica/conan-caf"
      
 linux: &linux
    os: linux
