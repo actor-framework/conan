@@ -2,11 +2,17 @@ project(CAFReusePackage)
 cmake_minimum_required(VERSION 3.5.1)
 
 if(NOT APPLE AND NOT WIN32)
-  set(EXTRA_FLAGS "-pthread")
+    set(EXTRA_FLAGS "-pthread")
 endif()
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
+
+if(DEFINED CONAN_LIBCXX)
+    if(CONAN_LIBCXX STREQUAL "libc++")
+        set(EXTRA_FLAGS "-lc++abi ${EXTRA_FLAGS}")
+    endif()
+endif()
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${EXTRA_FLAGS}")
 

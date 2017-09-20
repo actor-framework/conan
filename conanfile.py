@@ -7,8 +7,9 @@ import sys
 from conans import ConanFile
 from conans.errors import ConanException
 
-# TODO - CAF uses the *default* ABI. build.py is hardcoded to libstdc++11 for gcc/clang.
-# TODO - also CAF uses the default architecture x86 vs x86_64.  travis/appveyor.yml is hardcoded to 64 bit.
+# TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc.
+# TODO - CAF uses the default architecture.  travis/appveyor.yml is hardcoded to x86_64.
+# TODO - The clang 4.0 build is commented out in travis.yml due to CAF issue #545
 # TODO - change Travis and Appveyor config to conan-center
 # TODO - update docs
 

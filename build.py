@@ -11,6 +11,7 @@ if __name__ == "__main__":
             settings['compiler.libcxx'] = 'libstdc++11'
         elif settings['compiler'] == 'clang':
             settings['compiler.libcxx'] = 'libc++'
+
         filtered_builds.append([settings, options, env_vars, build_requires])
 
     builder.builds = filtered_builds
