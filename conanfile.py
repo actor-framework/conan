@@ -7,8 +7,10 @@ import sys
 from conans import ConanFile
 from conans.errors import ConanException
 
+# TODO - CAF uses the *default* ABI. build.py is hardcoded to libstdc++11 for gcc/clang.
+# TODO - also CAF uses the default architecture x86 vs x86_64.  travis/appveyor.yml is hardcoded to 64 bit.
 # TODO - change Travis and Appveyor config to conan-center
-# TODO - ABI, actually CAF uses the *default* C++11 ABI.  Update the docs.
+# TODO - update docs
 
 
 class CAFConan(ConanFile):
@@ -50,9 +52,12 @@ class CAFConan(ConanFile):
             lib_type = "-DCAF_BUILD_STATIC=ON" if self.options.shared else "-DCAF_BUILD_STATIC_ONLY=ON"
         logging = "-DCAF_LOG_LEVEL=%s" % self.options.log_level if self.options.log_level != "NONE" else ""
         skip_rpath = '-DCMAKE_SKIP_RPATH=ON' if sys.platform == 'darwin' else ''
+        build_type = '-DCMAKE_BUILD_TYPE=%s' % self.settings.build_type
+        compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
         standard_options = \
             "-DCAF_NO_EXAMPLES=ON -DCAF_NO_OPENCL=ON -DCAF_NO_TOOLS=ON -DCAF_NO_UNIT_TESTS=ON -DCAF_NO_PYTHON=ON"
-        configure = 'cmake .. %s %s %s %s' % (standard_options, skip_rpath, lib_type, logging)
+        configure = 'cmake .. %s %s %s %s %s %s' % \
+                    (standard_options, skip_rpath, lib_type, logging, build_type, compiler)
         self.run_command(configure, build_dir)
         self.run_command('make', build_dir)
         # TODO - Windows

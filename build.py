@@ -7,7 +7,7 @@ if __name__ == "__main__":
     filtered_builds = []
 
     for settings, options, env_vars, build_requires in builder.builds:
-        if settings['compiler'] == 'gcc':
+        if settings['compiler'] == 'gcc' or settings['compiler'] == 'clang':
             settings['compiler.libcxx'] = 'libstdc++11'
         filtered_builds.append([settings, options, env_vars, build_requires])
 

@@ -19,9 +19,11 @@ class CAFReuseConan(ConanFile):
 
     def build(self):
         self.copy_tests()
+        self.output.info('Compiler: ' + str(self.settings.compiler))
 
         cmake = CMake(self.settings)
-        self.run('cmake "%s" %s' % (self.conanfile_directory, cmake.command_line))
+        compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
+        self.run('cmake "%s" %s %s' % (self.conanfile_directory, cmake.command_line, compiler))
         self.run("cmake --build . %s" % cmake.build_config)
 
     def copy_tests(self):
