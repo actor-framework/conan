@@ -63,7 +63,7 @@ class CAFConan(ConanFile):
         configure = 'cmake .. %s %s %s %s %s %s' % \
                     (standard_options, skip_rpath, lib_type, logging, build_type, compiler)
         self.run_command(configure, build_dir)
-        self.run_command('make', build_dir)
+        self.run_command('cmake --build .', build_dir)
 
     def run_command(self, cmd, cwd=None):
         self.output.info(cmd)
