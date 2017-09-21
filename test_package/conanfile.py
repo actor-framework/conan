@@ -6,6 +6,7 @@ from conans import ConanFile, CMake
 from conans.errors import ConanException
 import conans.util.files as files
 import os
+import sys
 
 
 class CAFReuseConan(ConanFile):
@@ -20,8 +21,12 @@ class CAFReuseConan(ConanFile):
     def build(self):
         self.copy_tests()
         compiler = self.settings.compiler
-        self.output.info('Compiling with %s %s %s' %
-                         (compiler, compiler.version, compiler.libcxx))
+        if sys.platform == 'win32':
+            self.output.info('Compiling with %s %s' % (compiler, compiler.version))
+        else:
+            self.output.info('Compiling with %s %s %s' %
+                             (compiler, compiler.version, compiler.libcxx))
+
 
         cmake = CMake(self.settings)
         compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
