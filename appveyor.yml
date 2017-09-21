@@ -13,10 +13,8 @@ environment:
     CONAN_UPLOAD: "https://api.bintray.com/conan/sourcedelica/conan-caf"
     CONAN_ARCHS: "x86_64"
 
-    
+    # Note: CAF supports >= VS 2015 Update 3
     matrix:
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-          CONAN_VISUAL_VERSIONS: 12
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CONAN_VISUAL_VERSIONS: 14
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
