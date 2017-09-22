@@ -10,6 +10,10 @@ conan_basic_setup(TARGETS)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}")
 
+if (WIN32)
+    set(EXTRA_LIBS iphlpapi WS2_32)
+endif()
+
 add_executable(caf-test
              tests/libcaf_io/test/basp.cpp
              tests/libcaf_test/src/caf-test.cpp)

@@ -4,11 +4,10 @@ except ImportError:
     from io import StringIO
 import os
 import sys
-from conans import ConanFile
+from conans import ConanFile, CMake
 from conans.errors import ConanException
 
 
-# TODO - Windows
 # TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc and clang, also below.
 # TODO - CAF uses the default architecture.  travis/appveyor.yml is hardcoded to x86_64.
 # TODO - Add shared library test to matrix (one each for GCC/Clang/VS)
@@ -59,10 +58,12 @@ class CAFConan(ConanFile):
         compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
         standard_options = \
             "-DCAF_NO_EXAMPLES=ON -DCAF_NO_OPENCL=ON -DCAF_NO_TOOLS=ON -DCAF_NO_UNIT_TESTS=ON -DCAF_NO_PYTHON=ON"
-        configure = 'cmake .. %s %s %s %s %s %s' % \
-                    (standard_options, skip_rpath, lib_type, logging, build_type, compiler)
+
+        cmake = CMake(self.settings)
+        configure = 'cmake .. %s %s %s %s %s %s %s' % \
+                    (cmake.command_line, standard_options, skip_rpath, lib_type, logging, build_type, compiler)
         self._run_command(configure, build_dir)
-        self._run_command('cmake --build .', build_dir)
+        self._run_command('cmake --build . %s' % cmake.build_config, build_dir)
 
     def _run_command(self, cmd, cwd=None):
         self.output.info(cmd)
@@ -74,6 +75,8 @@ class CAFConan(ConanFile):
         self.copy("*.dylib",  dst="lib",         src="%s/build/lib" % self.source_dir)
         self.copy("*.so",     dst="lib",         src="%s/build/lib" % self.source_dir)
         self.copy("*.a",      dst="lib",         src="%s/build/lib" % self.source_dir)
+        self.copy("*.lib",    dst="lib",         src="%s/build/lib/%s" % (self.source_dir, self.settings.build_type),
+                  keep_path=False)
         self.copy("license*", dst="licenses", ignore_case=True, keep_path=False)
 
     def package_info(self):
