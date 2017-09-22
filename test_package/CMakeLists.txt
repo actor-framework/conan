@@ -8,12 +8,6 @@ endif()
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
-if(DEFINED CONAN_LIBCXX)
-    if(CONAN_LIBCXX STREQUAL "libc++")
-        set(EXTRA_LIBS "-lc++abi")
-    endif()
-endif()
-
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}")
 
 add_executable(caf-test

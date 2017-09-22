@@ -5,6 +5,7 @@ environment:
     PYTHON_VERSION: "2.7.8"
     PYTHON_ARCH: "32"
 
+    # TODO - is the version number really needed here?
     CONAN_REFERENCE: "caf/0.15.3"
     CONAN_USERNAME: "sourcedelica"
     CONAN_LOGIN_USERNAME: "sourcedelica"
@@ -14,6 +15,7 @@ environment:
     CONAN_ARCHS: "x86_64"
 
     # Note: CAF supports >= VS 2015 Update 3
+    # TODO: add one static library job for VS2015
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CONAN_VISUAL_VERSIONS: 14

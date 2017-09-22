@@ -9,12 +9,11 @@ from conans.errors import ConanException
 
 
 # TODO - Windows
-# TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc and clang.
+# TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc and clang, also below.
 # TODO - CAF uses the default architecture.  travis/appveyor.yml is hardcoded to x86_64.
-# TODO - The clang 4.0 build is commented out in travis.yml due to CAF issue #545
-# TODO - Get libc++ working for Clang on Travis
-# TODO - change Travis and Appveyor config to conan-center
+# TODO - Add shared library test to matrix (one each for GCC/Clang/VS)
 # TODO - update docs
+# TODO - change Travis and Appveyor config to conan-center
 
 
 class CAFConan(ConanFile):
@@ -45,8 +44,8 @@ class CAFConan(ConanFile):
             raise ConanException("You must use at least one of shared=True or static=True")
 
     def source(self):
-        self.run_command("git clone https://github.com/actor-framework/actor-framework.git")
-        self.run_command("git checkout %s" % self.version, self.source_dir)
+        self._run_command("git clone https://github.com/actor-framework/actor-framework.git")
+        self._run_command("git checkout %s" % self.version, self.source_dir)
 
     def build(self):
         lib_type = ""
@@ -62,10 +61,10 @@ class CAFConan(ConanFile):
             "-DCAF_NO_EXAMPLES=ON -DCAF_NO_OPENCL=ON -DCAF_NO_TOOLS=ON -DCAF_NO_UNIT_TESTS=ON -DCAF_NO_PYTHON=ON"
         configure = 'cmake .. %s %s %s %s %s %s' % \
                     (standard_options, skip_rpath, lib_type, logging, build_type, compiler)
-        self.run_command(configure, build_dir)
-        self.run_command('cmake --build .', build_dir)
+        self._run_command(configure, build_dir)
+        self._run_command('cmake --build .', build_dir)
 
-    def run_command(self, cmd, cwd=None):
+    def _run_command(self, cmd, cwd=None):
         self.output.info(cmd)
         self.run(cmd, True, cwd)
 
