@@ -33,6 +33,8 @@ matrix:
       - <<: *linux
         env: CONAN_CLANG_VERSIONS=3.9 CONAN_DOCKER_IMAGE=lasote/conanclang39
 
+# Clang 4.0 and Apple Clang 9.0 are not compiling currently
+# See https://github.com/actor-framework/actor-framework/issues/545
 #      - <<: *linux
 #        env: CONAN_CLANG_VERSIONS=4.0 CONAN_DOCKER_IMAGE=lasote/conanclang40
 

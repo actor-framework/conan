@@ -57,7 +57,7 @@ class CAFConan(ConanFile):
         logging = "-DCAF_LOG_LEVEL=%s" % self.options.log_level if self.options.log_level != "NONE" else ""
         skip_rpath = '-DCMAKE_SKIP_RPATH=ON' if sys.platform == 'darwin' else ''
         build_type = '-DCMAKE_BUILD_TYPE=%s' % self.settings.build_type
-        compiler = '-DCMAKE_CXX_COMPILER=clang++ -DCAF_NO_AUTO_LIBCPP=ON' if self.settings.compiler == 'clang' else ''
+        compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
         standard_options = \
             "-DCAF_NO_EXAMPLES=ON -DCAF_NO_OPENCL=ON -DCAF_NO_TOOLS=ON -DCAF_NO_UNIT_TESTS=ON -DCAF_NO_PYTHON=ON"
         configure = 'cmake .. %s %s %s %s %s %s' % \

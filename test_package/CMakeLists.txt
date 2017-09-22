@@ -10,11 +10,11 @@ conan_basic_setup(TARGETS)
 
 if(DEFINED CONAN_LIBCXX)
     if(CONAN_LIBCXX STREQUAL "libc++")
-        set(EXTRA_FLAGS "-lc++abi ${EXTRA_FLAGS}")
+        set(EXTRA_LIBS "-lc++abi")
     endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${EXTRA_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}")
 
 add_executable(caf-test
              tests/libcaf_io/test/basp.cpp
@@ -22,4 +22,4 @@ add_executable(caf-test
 
 target_include_directories(caf-test PUBLIC tests/libcaf_test)
 
-target_link_libraries(caf-test CONAN_PKG::caf)
+target_link_libraries(caf-test CONAN_PKG::caf ${EXTRA_LIBS})
