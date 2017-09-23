@@ -46,7 +46,7 @@ CAF compiles with the default C++ ABI.
 Verify which version of the C++ ABI your compiler is using by default:
 
 ```
-g++ --version -v 2>&1 | grep -- --with-default-libstdcxx-abi
+g++ --version -v 2>&1 | grep with-default-libstdcxx-abi
 ```
 
 Edit `~/.conan/conan.conf` and change `compiler.libcxx` depending on the

@@ -3,14 +3,14 @@ try:
 except ImportError:
     from io import StringIO
 import os
+import subprocess
 import sys
 from conans import ConanFile, CMake
 from conans.errors import ConanException
 
 
-# TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc and clang, also below.
-# TODO - CAF uses the default architecture.  travis/appveyor.yml is hardcoded to x86_64.
-# TODO - Add shared library test to matrix (one each for GCC/Clang/VS)
+# TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc, also _gcc_libcxx() workaround below.
+# TODO - Add standard library and architecture to CAF configure/CMakeLists.txt
 # TODO - update docs
 # TODO - change Travis and Appveyor config to conan-center
 
@@ -34,7 +34,8 @@ class CAFConan(ConanFile):
             if self.settings.compiler.version < 4.8:
                 raise ConanException("g++ >= 4.8 is required, yours is %s" % self.settings.compiler.version)
             else:
-                self.settings.compiler.libcxx = 'libstdc++11'
+                # TODO - this is temporary until CAF adds support for configuring stdlib
+                self.settings.compiler.libcxx = self._gcc_libcxx()
         if self.settings.compiler == "clang" and str(self.settings.compiler.version) < "3.4":
             raise ConanException("clang >= 3.4 is required, yours is %s" % self.settings.compiler.version)
         if self.settings.compiler == "Visual Studio" and str(self.settings.compiler.version) < "14":
@@ -42,9 +43,22 @@ class CAFConan(ConanFile):
         if not (self.options.shared or self.options.static):
             raise ConanException("You must use at least one of shared=True or static=True")
 
+    def _gcc_libcxx(self):
+        if self.settings.compiler.version < 5:
+            libcxx = 'libstdc++'
+        else:
+            process = subprocess.Popen(['g++', '--version', '-v'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = process.communicate()
+            libcxx = 'libstdc++11' if 'with-default-libstdcxx-abi=new' in err else 'libstdc++'
+        return libcxx
+
     def source(self):
-        self._run_command("git clone https://github.com/actor-framework/actor-framework.git")
-        self._run_command("git checkout %s" % self.version, self.source_dir)
+        # FIXME - revert back to CAF repo, this is for testing Clang 4.0/Apple Clang 9.0
+        self._run_command("git clone https://github.com/sourcedelica/actor-framework.git")
+        self._run_command("git checkout 0.15.3.1", self.source_dir)
+
+        # self._run_command("git clone https://github.com/actor-framework/actor-framework.git")
+        # self._run_command("git checkout %s" % self.version, self.source_dir)
 
     def build(self):
         lib_type = ""
@@ -74,6 +88,7 @@ class CAFConan(ConanFile):
         self.copy("*.hpp",    dst="include/caf", src="%s/libcaf_io/caf" % self.source_dir)
         self.copy("*.dylib",  dst="lib",         src="%s/build/lib" % self.source_dir)
         self.copy("*.so",     dst="lib",         src="%s/build/lib" % self.source_dir)
+        self.copy("*.so.*",   dst="lib",         src="%s/build/lib" % self.source_dir)
         self.copy("*.a",      dst="lib",         src="%s/build/lib" % self.source_dir)
         self.copy("*.lib",    dst="lib",         src="%s/build/lib/%s" % (self.source_dir, self.settings.build_type),
                   keep_path=False)

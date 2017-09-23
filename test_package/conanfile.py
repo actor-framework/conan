@@ -3,7 +3,6 @@ try:
 except ImportError:
     from io import StringIO
 from conans import ConanFile, CMake
-from conans.errors import ConanException
 import conans.util.files as files
 import os
 import sys
@@ -26,7 +25,6 @@ class CAFReuseConan(ConanFile):
         else:
             self.output.info('Compiling with %s %s %s' %
                              (compiler, compiler.version, compiler.libcxx))
-
 
         cmake = CMake(self.settings)
         compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
