@@ -13,7 +13,7 @@ from conans.errors import ConanException
 # TODO - Add to CAF configure/CMakeLists.txt: libcxx, arch, additional CXX flags (for /MP8 in VS)
 # TODO - update docs
 # TODO - change Travis and Appveyor config to conan-center
-# TODO - static runtime option
+# TODO - static runtime option (after PR 590 is in a tagged build)
 
 
 class CAFConan(ConanFile):
