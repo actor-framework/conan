@@ -4,8 +4,7 @@ except ImportError:
     from io import StringIO
 import os
 import subprocess
-import sys
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 from conans.errors import ConanException
 
 
@@ -23,12 +22,13 @@ class CAFConan(ConanFile):
     description = "An open source implementation of the Actor Model in C++"
     url = "http://actor-framework.org"
     license = "BSD-3-Clause"
-
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "static": [True, False],
                "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]}
     default_options = "shared=False", "static=True", "log_level=NONE"
-    source_dir = "actor-framework"
+    generators = 'cmake'
+
+    source_dir = 'actor-framework-%s' % version
 
     def configure(self):
         if self.settings.compiler == "gcc":
@@ -54,52 +54,65 @@ class CAFConan(ConanFile):
         return libcxx
 
     def source(self):
-        # FIXME - revert back to CAF repo, this is for testing Clang 4.0/Apple Clang 9.0
-        self._run_command("git clone https://github.com/sourcedelica/actor-framework.git")
-        self._run_command("git checkout 0.15.3.1", cwd=self.source_dir)
+        # FIXME - revert back to CAF release, this is for testing Clang 4.0/Apple Clang 9.0
+        url_format = 'https://github.com/sourcedelica/actor-framework/archive/%s.zip'
+        version = '0.15.3.1'
+        self.source_dir = 'actor-framework-%s' % version   # REMOVE
 
-        # self._run_command("git clone https://github.com/actor-framework/actor-framework.git")
-        # self._run_command("git checkout %s" % self.version, self.source_dir)
+        # url_format = 'https://github.com/sourcedelica/actor-framework/archive/%s.zip'
+        # version = self.version
+
+        tools.download(url_format % version, '%s.zip' % version)
+        tools.unzip('%s.zip' % version)
 
     def build(self):
-        lib_type = ""
-        build_dir = "%s/build" % self.source_dir
+        build_dir = '%s/build' % self.source_dir
         os.mkdir(build_dir)
+
+        conan_magic_lines = '''project(caf C CXX)
+        set(CONAN_CXX_FLAGS '-std=c++11')
+        include(../conanbuildinfo.cmake)
+        conan_basic_setup()
+        '''
+        cmake_file = '%s/CMakeLists.txt' % self.source_dir
+        tools.replace_in_file(cmake_file, 'project(caf C CXX)', conan_magic_lines)
+
+        cmake = CMake(self)
+        cmake.parallel = True
+
+        # skip_rpath = '-DCMAKE_SKIP_RPATH=ON' if sys.platform == 'darwin' else ''
+        # build_type = '-DCMAKE_BUILD_TYPE=%s' % self.settings.build_type
+        # compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
+
+        for define in ['CAF_NO_EXAMPLES', 'CAF_NO_TOOLS', 'CAF_NO_UNIT_TESTS', 'CAF_NO_PYTHON']:
+            cmake.definitions[define] = 'ON'
         if self.options.static:
-            lib_type = "-DCAF_BUILD_STATIC=ON" if self.options.shared else "-DCAF_BUILD_STATIC_ONLY=ON"
-        logging = "-DCAF_LOG_LEVEL=%s" % self.options.log_level if self.options.log_level != "NONE" else ""
-        skip_rpath = '-DCMAKE_SKIP_RPATH=ON' if sys.platform == 'darwin' else ''
-        build_type = '-DCMAKE_BUILD_TYPE=%s' % self.settings.build_type
-        compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
-        standard_options = \
-            "-DCAF_NO_EXAMPLES=ON -DCAF_NO_OPENCL=ON -DCAF_NO_TOOLS=ON -DCAF_NO_UNIT_TESTS=ON -DCAF_NO_PYTHON=ON"
-        build_options = '-j8' if sys.platform != 'win32' else ''
+            static_def = 'CAF_BUILD_STATIC' if self.options.shared else 'CAF_BUILD_STATIC_ONLY'
+            cmake.definitions[static_def] = 'ON'
+        if self.options.log_level and self.options.log_level != 'NONE':
+            cmake.definitions['CAF_LOG_LEVEL'] = self.options.log_level
 
-        cmake = CMake(self.settings)
-        configure = 'cmake .. %s %s %s %s %s %s %s' % \
-                    (cmake.command_line, standard_options, skip_rpath, lib_type, logging, build_type, compiler)
-        self._run_command(configure, cwd=build_dir)
+        cmake.configure(source_dir=self.source_dir)
 
-        self._run_command('cmake --build . %s -- %s' % (cmake.build_config, build_options), cwd=build_dir)
+        cmake.build()
 
     def _run_command(self, cmd, output=True, cwd=None):
         self.output.info(cmd)
         self.run(cmd, output=output, cwd=cwd)
 
     def package(self):
-        self.copy("*.hpp",    dst="include/caf", src="%s/libcaf_core/caf" % self.source_dir)
-        self.copy("*.hpp",    dst="include/caf", src="%s/libcaf_io/caf" % self.source_dir)
-        self.copy("*.dylib",  dst="lib",         src="%s/build/lib" % self.source_dir)
-        self.copy("*.so",     dst="lib",         src="%s/build/lib" % self.source_dir)
-        self.copy("*.so.*",   dst="lib",         src="%s/build/lib" % self.source_dir)
-        self.copy("*.a",      dst="lib",         src="%s/build/lib" % self.source_dir)
-        self.copy("*.lib",    dst="lib",         src="%s/build/lib/%s" % (self.source_dir, self.settings.build_type),
-                  keep_path=False)
-        self.copy("license*", dst="licenses", ignore_case=True, keep_path=False)
+        self.copy('*.hpp',    dst='include/caf', src='%s/libcaf_core/caf' % self.source_dir)
+        self.copy('*.hpp',    dst='include/caf', src='%s/libcaf_io/caf' % self.source_dir)
+        self.copy('*.dylib',  dst='lib',         src='lib')
+        self.copy('*.so',     dst='lib',         src='lib')
+        self.copy('*.so.*',   dst='lib',         src='lib')
+        self.copy('*.a',      dst='lib',         src='lib')
+        self.copy('*.lib',    dst='lib',         src='%s' % self.settings.build_type, keep_path=False)
+        self.copy('license*', dst='licenses',    ignore_case=True, keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = []
         if self.options.shared:
-            self.cpp_info.libs.extend(["caf_io", "caf_core"])
+            self.cpp_info.libs.extend(['caf_io', 'caf_core'])
         if self.options.static:
-            self.cpp_info.libs.extend(["caf_io_static", "caf_core_static"])
+            self.cpp_info.libs.extend(['caf_io_static', 'caf_core_static'])

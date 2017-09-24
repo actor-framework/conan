@@ -1,6 +1,7 @@
 # [Conan](http://conan.io) recipe for [CAF](http://actor-framework.org)
 
-[![Build Status](https://travis-ci.org/sourcedelica/conan-caf.svg?branch=bintray_setup)](https://travis-ci.org/sourcedelica/conan-caf)
+[![Travis Build Status](https://travis-ci.org/sourcedelica/conan-caf.svg?branch=bintray_setup)](https://travis-ci.org/sourcedelica/conan-caf)
+[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/8qdaau0pxfn3g58o/branch/bintray_setup?svg=true)](https://ci.appveyor.com/project/sourcedelica/conan-caf/branch/bintray_setup)
 
 ## Setup
 
