@@ -27,7 +27,7 @@ if __name__ == "__main__":
         if system != 'Windows' or settings['compiler.runtime'] in {'MD', 'MDd'}:
             filtered_builds.append([settings, options, env_vars, build_requires])
 
-        # Do one shared library build per compiler
+        # Add one shared library build per compiler (except Windows)
         if platform_info.system() != 'Windows' and compiler not in compilers:
             filtered_builds.append([settings, {'caf:shared': True, 'caf:static': False}, env_vars, build_requires])
             compilers.add(compiler)

@@ -8,15 +8,23 @@ from conans import ConanFile, CMake, tools
 from conans.errors import ConanException
 
 
-# TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc, also _gcc_libcxx() workaround below.
+# TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc, see _gcc_libcxx() workaround below
 # TODO - Add to CAF configure/CMakeLists.txt: libcxx, arch, additional CXX flags (for /MP8 in VS)
 # TODO - update docs
-# TODO - change Travis and Appveyor config to conan-center
 # TODO - static runtime option (after PR 590 is in a tagged build)
 
 
 class CAFConan(ConanFile):
+    # Note: this version number is also in test_package/conanfile.py, .travis.yml and appveyor.yml
     version = '0.15.3'
+
+    # TODO - This fork has a fix for https://github.com/actor-framework/actor-framework/issues/545
+    git_version = '0.15.3.1'
+    git_user = 'sourcedelica'
+    # git_version = version
+    # git_user = 'actor-framework'
+
+    source_dir = 'actor-framework-%s' % git_version
 
     name = "caf"
     description = "An open source implementation of the Actor Model in C++"
@@ -27,8 +35,6 @@ class CAFConan(ConanFile):
                "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]}
     default_options = "shared=False", "static=True", "log_level=NONE"
     generators = 'cmake'
-
-    source_dir = 'actor-framework-%s' % version
 
     def configure(self):
         if self.settings.compiler == "gcc":
@@ -54,23 +60,17 @@ class CAFConan(ConanFile):
         return libcxx
 
     def source(self):
-        # FIXME - revert back to CAF release, this is for testing Clang 4.0/Apple Clang 9.0
-        url_format = 'https://github.com/sourcedelica/actor-framework/archive/%s.zip'
-        version = '0.15.3.1'
-        self.source_dir = 'actor-framework-%s' % version   # REMOVE
-
-        # url_format = 'https://github.com/sourcedelica/actor-framework/archive/%s.zip'
-        # version = self.version
-
-        tools.download(url_format % version, '%s.zip' % version)
-        tools.unzip('%s.zip' % version)
+        git_url = 'https://github.com/%s/actor-framework/archive/%s.zip' % (self.git_user, self.git_version)
+        zip_filename = '%s.zip' % self.git_version
+        tools.download(git_url, zip_filename)
+        tools.unzip(zip_filename)
 
     def build(self):
         build_dir = '%s/build' % self.source_dir
         os.mkdir(build_dir)
 
         conan_magic_lines = '''project(caf C CXX)
-        set(CONAN_CXX_FLAGS '-std=c++11')
+        set(CMAKE_CXX_STANDARD 11)
         include(../conanbuildinfo.cmake)
         conan_basic_setup()
         '''
@@ -79,10 +79,6 @@ class CAFConan(ConanFile):
 
         cmake = CMake(self)
         cmake.parallel = True
-
-        # skip_rpath = '-DCMAKE_SKIP_RPATH=ON' if sys.platform == 'darwin' else ''
-        # build_type = '-DCMAKE_BUILD_TYPE=%s' % self.settings.build_type
-        # compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
 
         for define in ['CAF_NO_EXAMPLES', 'CAF_NO_TOOLS', 'CAF_NO_UNIT_TESTS', 'CAF_NO_PYTHON']:
             cmake.definitions[define] = 'ON'
