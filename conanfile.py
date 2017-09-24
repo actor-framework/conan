@@ -10,9 +10,10 @@ from conans.errors import ConanException
 
 
 # TODO - CAF uses the default ABI. build.py is hardcoded to libstdc++11 for gcc, also _gcc_libcxx() workaround below.
-# TODO - Add standard library and architecture to CAF configure/CMakeLists.txt
+# TODO - Add to CAF configure/CMakeLists.txt: libcxx, arch, additional CXX flags (for /MP8 in VS)
 # TODO - update docs
 # TODO - change Travis and Appveyor config to conan-center
+# TODO - static runtime option
 
 
 class CAFConan(ConanFile):
@@ -55,7 +56,7 @@ class CAFConan(ConanFile):
     def source(self):
         # FIXME - revert back to CAF repo, this is for testing Clang 4.0/Apple Clang 9.0
         self._run_command("git clone https://github.com/sourcedelica/actor-framework.git")
-        self._run_command("git checkout 0.15.3.1", self.source_dir)
+        self._run_command("git checkout 0.15.3.1", cwd=self.source_dir)
 
         # self._run_command("git clone https://github.com/actor-framework/actor-framework.git")
         # self._run_command("git checkout %s" % self.version, self.source_dir)
@@ -72,16 +73,18 @@ class CAFConan(ConanFile):
         compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
         standard_options = \
             "-DCAF_NO_EXAMPLES=ON -DCAF_NO_OPENCL=ON -DCAF_NO_TOOLS=ON -DCAF_NO_UNIT_TESTS=ON -DCAF_NO_PYTHON=ON"
+        build_options = '-j8' if sys.platform != 'win32' else ''
 
         cmake = CMake(self.settings)
         configure = 'cmake .. %s %s %s %s %s %s %s' % \
                     (cmake.command_line, standard_options, skip_rpath, lib_type, logging, build_type, compiler)
-        self._run_command(configure, build_dir)
-        self._run_command('cmake --build . %s' % cmake.build_config, build_dir)
+        self._run_command(configure, cwd=build_dir)
 
-    def _run_command(self, cmd, cwd=None):
+        self._run_command('cmake --build . %s -- %s' % (cmake.build_config, build_options), cwd=build_dir)
+
+    def _run_command(self, cmd, output=True, cwd=None):
         self.output.info(cmd)
-        self.run(cmd, True, cwd)
+        self.run(cmd, output=output, cwd=cwd)
 
     def package(self):
         self.copy("*.hpp",    dst="include/caf", src="%s/libcaf_core/caf" % self.source_dir)

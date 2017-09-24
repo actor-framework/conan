@@ -7,6 +7,7 @@ if __name__ == "__main__":
     # For testing Docker on Mac
     force_linux = os.getenv('CONAN_LINUX_PLATFORM')
     platform_info = linux_platform if force_linux else PlatformInfo()
+    system = platform_info.system()
 
     builder = ConanMultiPackager(platform_info=platform_info)
     builder.add_common_builds()
@@ -22,10 +23,12 @@ if __name__ == "__main__":
         if force_linux:
             settings['os'] = 'Linux'
 
-        filtered_builds.append([settings, options, env_vars, build_requires])
+        # Support static runtime once PR 590 is in a tagged build
+        if system != 'Windows' or settings['compiler.runtime'] in {'MD', 'MDd'}:
+            filtered_builds.append([settings, options, env_vars, build_requires])
 
         # Do one shared library build per compiler
-        if compiler not in compilers:
+        if platform_info.system() != 'Windows' and compiler not in compilers:
             filtered_builds.append([settings, {'caf:shared': True, 'caf:static': False}, env_vars, build_requires])
             compilers.add(compiler)
 

@@ -28,23 +28,27 @@ class CAFReuseConan(ConanFile):
 
         cmake = CMake(self.settings)
         compiler = '-DCMAKE_CXX_COMPILER=clang++' if self.settings.compiler == 'clang' else ''
-        self.run('cmake "%s" %s %s' % (self.conanfile_directory, cmake.command_line, compiler))
-        self.run("cmake --build . %s" % cmake.build_config)
+        self._run_command('cmake "%s" %s %s' % (self.conanfile_directory, cmake.command_line, compiler))
+        self._run_command("cmake --build . %s" % cmake.build_config)
+
+    def _run_command(self, cmd, output=True, cwd=None):
+        self.output.info(cmd)
+        self.run(cmd, output=output, cwd=cwd)
 
     def copy_tests(self):
         tests_dir = "%s/tests" % self.conanfile_directory
         repo_url = "https://github.com/actor-framework/actor-framework.git"
-        self.run("rm -rf %s" % tests_dir)
-        self.run("git init %s" % tests_dir)
-        self.run("git remote add origin %s" % repo_url, True, tests_dir)
-        self.run("git config core.sparseCheckout true", True, tests_dir)
+        self._run_command("rm -rf %s" % tests_dir)
+        self._run_command("git init %s" % tests_dir)
+        self._run_command("git remote add origin %s" % repo_url, output=True, cwd=tests_dir)
+        self._run_command("git config core.sparseCheckout true", output=True, cwd=tests_dir)
         sparse_checkout = "%s/.git/info/sparse-checkout" % tests_dir
         files.save(sparse_checkout, "libcaf_test\n")
         files.save(sparse_checkout, "libcaf_io/test\n", True)
-        self.run("git pull origin %s --depth 1" % self.version, True, tests_dir)
+        self._run_command("git pull origin %s --depth 1" % self.version, output=True, cwd=tests_dir)
 
     def test(self):
-        self.run(os.path.join('.', 'caf-test'), True, 'bin')
+        self._run_command(os.path.join('.', 'caf-test'), output=True, cwd='bin')
 
     def imports(self):
       self.copy("*.dll", dst="bin", src="bin")
