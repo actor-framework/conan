@@ -12,8 +12,12 @@ class CAFConan(ConanFile):
     # Note: when this version number changes it also needs to be changed in:
     #  test_package/conanfile.py, .travis.yml, appveyor.yml
     version = '0.15.3'
-    git_version = version
-    git_user = 'actor-framework'
+
+    git_version = '0.15.3.1'
+    git_user = 'sourcedelica'
+
+    # git_version = version
+    # git_user = 'actor-framework'
 
     source_dir = 'actor-framework-%s' % git_version
 
