@@ -3,8 +3,8 @@ env:
    global:
      - CONAN_REFERENCE: "caf/0.15.3"
      - CONAN_USERNAME: "actor-framework"
-     - CONAN_LOGIN_USERNAME: "actor-framework"
-     - CONAN_CHANNEL: "testing"
+     - CONAN_LOGIN_USERNAME: "sourcedelica"
+     - CONAN_CHANNEL: "stable"
      - CONAN_UPLOAD: "https://api.bintray.com/conan/actor-framework/actor-framework"
      - CONAN_ARCHS: "x86_64"
 

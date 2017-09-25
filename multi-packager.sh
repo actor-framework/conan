@@ -7,7 +7,7 @@
 #    CONAN_PASSWORD=xxxx ./multi-packager.sh
 
 export CONAN_ARCHS=x86_64
-export CONAN_LOGIN_USERNAME=actor-framework
+export CONAN_LOGIN_USERNAME=sourcedelica
 export CONAN_CHANNEL=stable
 export CONAN_REFERENCE=caf/0.15.3
 export CONAN_UPLOAD=https://api.bintray.com/conan/actor-framework/actor-framework
