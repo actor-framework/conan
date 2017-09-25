@@ -1,7 +1,9 @@
 # [Conan](http://conan.io) recipe for [CAF](http://actor-framework.org)
 
-[![Travis Build Status](https://travis-ci.org/sourcedelica/conan-caf.svg?branch=bintray_setup)](https://travis-ci.org/sourcedelica/conan-caf)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/8qdaau0pxfn3g58o/branch/bintray_setup?svg=true)](https://ci.appveyor.com/project/sourcedelica/conan-caf/branch/bintray_setup)
+|Platform|Build Status|
+|:----|:----|
+|Linux|[![Travis Build Status](https://travis-ci.org/sourcedelica/conan-caf.svg?branch=bintray_setup)](https://travis-ci.org/sourcedelica/conan-caf)|
+|Windows|[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/8qdaau0pxfn3g58o/branch/bintray_setup?svg=true)](https://ci.appveyor.com/project/sourcedelica/conan-caf/branch/bintray_setup)|
 
 ## Setup
 
@@ -70,7 +72,6 @@ You may need to run the `conan` command once to generate it.
    1. `conanfile.py`
    2. `.travis.yml`
    3. `appveyor.yml`
-   4. `test_package/conanfile.py`
 2. Run `conan test_package`
  
 The syntax for `conan test_package` is  
