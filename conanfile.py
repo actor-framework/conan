@@ -12,7 +12,7 @@ class CAFConan(ConanFile):
     # Note: if you change this version, also update .travis.yml and appveyor.yml
     version = '0.15.3'
 
-    git_version = '0.15.3.1'
+    git_version = '0.15.3.2'
     git_user = 'sourcedelica'
 
     # git_version = version
