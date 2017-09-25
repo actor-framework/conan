@@ -70,7 +70,6 @@ class CAFConan(ConanFile):
         os.mkdir(build_dir)
 
         conan_magic_lines = '''project(caf C CXX)
-        set(CMAKE_CXX_STANDARD 11)
         include(../conanbuildinfo.cmake)
         conan_basic_setup()
         '''
@@ -79,7 +78,7 @@ class CAFConan(ConanFile):
 
         cmake = CMake(self)
         cmake.parallel = True
-
+        cmake.definitions['CMAKE_CXX_STANDARD'] = '11'
         for define in ['CAF_NO_EXAMPLES', 'CAF_NO_TOOLS', 'CAF_NO_UNIT_TESTS', 'CAF_NO_PYTHON']:
             cmake.definitions[define] = 'ON'
         if self.options.static:
@@ -103,7 +102,7 @@ class CAFConan(ConanFile):
         self.copy('*.so',     dst='lib',         src='lib')
         self.copy('*.so.*',   dst='lib',         src='lib')
         self.copy('*.a',      dst='lib',         src='lib')
-        self.copy('*.lib',    dst='lib',         src='%s' % self.settings.build_type, keep_path=False)
+        self.copy('*.lib',    dst='lib',         src='lib')
         self.copy('license*', dst='licenses',    ignore_case=True, keep_path=False)
 
     def package_info(self):
