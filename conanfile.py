@@ -9,8 +9,7 @@ from conans.errors import ConanException
 
 
 class CAFConan(ConanFile):
-    # Note: when this version number changes it also needs to be changed in:
-    #  test_package/conanfile.py, .travis.yml, appveyor.yml
+    # Note: if you change this version, also update .travis.yml and appveyor.yml
     version = '0.15.3'
 
     git_version = '0.15.3.1'
@@ -21,29 +20,30 @@ class CAFConan(ConanFile):
 
     source_dir = 'actor-framework-%s' % git_version
 
-    name = "caf"
-    description = "An open source implementation of the Actor Model in C++"
-    url = "http://actor-framework.org"
-    license = "BSD-3-Clause"
-    settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "static": [True, False],
-               "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]}
-    default_options = "shared=False", "static=True", "log_level=NONE"
+    name = 'caf'
+    description = 'An open source implementation of the Actor Model in C++'
+    url = 'http://actor-framework.org'
+    license = 'BSD-3-Clause'
+    settings = 'os', 'compiler', 'build_type', 'arch'
+    options = {'shared': [True, False], 'static': [True, False],
+               'log_level': ['NONE', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'TRACE']}
+    default_options = 'shared=False', 'static=True', 'log_level=NONE'
     generators = 'cmake'
 
     def configure(self):
-        if self.settings.compiler == "gcc":
+        if self.settings.compiler == 'gcc':
             if self.settings.compiler.version < 4.8:
-                raise ConanException("g++ >= 4.8 is required, yours is %s" % self.settings.compiler.version)
+                raise ConanException('g++ >= 4.8 is required, yours is %s' % self.settings.compiler.version)
             else:
-                # This is temporary until CAF adds support for configuring stdlib
+                # This is temporary until support is in CAF for standard lib configuration
+                # https://github.com/actor-framework/actor-framework/issues/597
                 self.settings.compiler.libcxx = self._gcc_libcxx()
-        if self.settings.compiler == "clang" and str(self.settings.compiler.version) < "3.4":
-            raise ConanException("clang >= 3.4 is required, yours is %s" % self.settings.compiler.version)
-        if self.settings.compiler == "Visual Studio" and str(self.settings.compiler.version) < "14":
-            raise ConanException("Visual Studio >= 14 is required, yours is %s" % self.settings.compiler.version)
+        if self.settings.compiler == 'clang' and str(self.settings.compiler.version) < '3.4':
+            raise ConanException('clang >= 3.4 is required, yours is %s' % self.settings.compiler.version)
+        if self.settings.compiler == 'Visual Studio' and str(self.settings.compiler.version) < '14':
+            raise ConanException('Visual Studio >= 14 is required, yours is %s' % self.settings.compiler.version)
         if not (self.options.shared or self.options.static):
-            raise ConanException("You must use at least one of shared=True or static=True")
+            raise ConanException('You must use at least one of shared=True or static=True')
 
     def _gcc_libcxx(self):
         if self.settings.compiler.version < 5:
@@ -85,10 +85,6 @@ class CAFConan(ConanFile):
         cmake.configure(source_dir=self.source_dir)
 
         cmake.build()
-
-    def _run_command(self, cmd, output=True, cwd=None):
-        self.output.info(cmd)
-        self.run(cmd, output=output, cwd=cwd)
 
     def package(self):
         self.copy('*.hpp',    dst='include/caf', src='%s/libcaf_core/caf' % self.source_dir)
