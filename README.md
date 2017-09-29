@@ -14,7 +14,7 @@ pip install conan
 
 ## Usage
 
-Add a requirement for `caf/version@sourcedelica/testing`
+Add a requirement for `caf/version@actor-framework/stable`
 to your `conanfile.txt` or `conanfile.py`.
 
 Check `conanfile.py` in this repo for the _version_.  It is
@@ -72,9 +72,9 @@ You may need to run the `conan` command once to generate it.
    1. `conanfile.py`
    2. `.travis.yml`
    3. `appveyor.yml`
-2. Run `conan test_package`
+2. Run `conan create`
  
-The syntax for `conan test_package` is  
+The syntax for `conan create` is
 ```
 conan create actor-framework/stable [-o caf:option=value]...
 ```

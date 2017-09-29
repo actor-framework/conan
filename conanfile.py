@@ -10,13 +10,10 @@ from conans.errors import ConanException
 
 class CAFConan(ConanFile):
     # Note: if you change this version, also update .travis.yml and appveyor.yml
-    version = '0.15.3'
+    version = '0.15.4'
 
-    git_version = '0.15.3.2'
-    git_user = 'sourcedelica'
-
-    # git_version = version
-    # git_user = 'actor-framework'
+    git_version = version
+    git_user = 'actor-framework'
 
     source_dir = 'actor-framework-%s' % git_version
 
