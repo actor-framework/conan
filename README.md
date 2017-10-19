@@ -2,8 +2,8 @@
 
 |Platform|Build Status|
 |:----|:----|
-|Linux|[![Travis Build Status](https://travis-ci.org/sourcedelica/conan-caf.svg?branch=bintray_setup)](https://travis-ci.org/sourcedelica/conan-caf)|
-|Windows|[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/8qdaau0pxfn3g58o/branch/bintray_setup?svg=true)](https://ci.appveyor.com/project/sourcedelica/conan-caf/branch/bintray_setup)|
+|Linux|[![Travis Build Status](https://travis-ci.org/sourcedelica/conan-caf.svg?branch=0.15.5-upgrade)](https://travis-ci.org/sourcedelica/conan-caf)|
+|Windows|[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/8qdaau0pxfn3g58o/branch/0.15.5-upgrade?svg=true)](https://ci.appveyor.com/project/sourcedelica/conan-caf/branch/bintray_setup)|
 
 ## Setup
 
@@ -14,15 +14,8 @@ pip install conan
 
 ## Usage
 
-Add a requirement for `caf/version@actor-framework/stable`
+Add a requirement for `caf/0.15.5@actor-framework/stable`
 to your `conanfile.txt` or `conanfile.py`.
-
-Check `conanfile.py` in this repo for the _version_.  It is
-the first attribute in the class definition:
-```
-class CAFConan(ConanFile):
-    version = '0.15.3'
-```
 
 ### Build Options
 

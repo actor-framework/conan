@@ -1,7 +1,3 @@
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
 import os
 import subprocess
 from conans import ConanFile, CMake, tools
@@ -10,7 +6,7 @@ from conans.errors import ConanException
 
 class CAFConan(ConanFile):
     # Note: if you change this version, also update .travis.yml and appveyor.yml
-    version = '0.15.4'
+    version = '0.15.5'
 
     git_version = version
     git_user = 'actor-framework'
@@ -47,7 +43,7 @@ class CAFConan(ConanFile):
             libcxx = 'libstdc++'
         else:
             process = subprocess.Popen(['g++', '--version', '-v'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            out, err = process.communicate()
+            _, err = process.communicate()
             libcxx = 'libstdc++11' if 'with-default-libstdcxx-abi=new' in err else 'libstdc++'
         return libcxx
 
@@ -59,7 +55,8 @@ class CAFConan(ConanFile):
 
     def build(self):
         build_dir = '%s/build' % self.source_dir
-        os.mkdir(build_dir)
+        if not os.path.exists(build_dir):
+            os.mkdir(build_dir)
 
         conan_magic_lines = '''project(caf C CXX)
         include(../conanbuildinfo.cmake)
@@ -71,8 +68,12 @@ class CAFConan(ConanFile):
         cmake = CMake(self)
         cmake.parallel = True
         cmake.definitions['CMAKE_CXX_STANDARD'] = '11'
+        if tools.os_info.is_windows or self.settings.arch == 'x86':
+            cmake.definitions['CAF_NO_OPENSSL'] = 'ON'
         for define in ['CAF_NO_EXAMPLES', 'CAF_NO_TOOLS', 'CAF_NO_UNIT_TESTS', 'CAF_NO_PYTHON']:
             cmake.definitions[define] = 'ON'
+        if tools.os_info.is_macos and self.settings.arch == 'x86':
+            cmake.definitions['CMAKE_OSX_ARCHITECTURES'] = 'i386'
         if self.options.static:
             static_def = 'CAF_BUILD_STATIC' if self.options.shared else 'CAF_BUILD_STATIC_ONLY'
             cmake.definitions[static_def] = 'ON'
