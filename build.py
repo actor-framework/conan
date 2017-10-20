@@ -23,12 +23,11 @@ if __name__ == "__main__":
         if force_linux:
             settings['os'] = 'Linux'
 
-        # Support static runtime once PR 590 is in a tagged build
         if system != 'Windows' or settings['compiler.runtime'] in {'MD', 'MDd'}:
             filtered_builds.append([settings, options, env_vars, build_requires])
 
-        # Add one shared library build per compiler (except Windows)
-        if platform_info.system() != 'Windows' and compiler not in compilers:
+        # Add one shared library build per x86_64 compiler (except Windows)
+        if platform_info.system() != 'Windows' and settings['arch'] == 'x86_64' and compiler not in compilers:
             filtered_builds.append([settings, {'caf:shared': True, 'caf:static': False}, env_vars, build_requires])
             compilers.add(compiler)
 
