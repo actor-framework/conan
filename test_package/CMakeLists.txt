@@ -8,6 +8,10 @@ conan_basic_setup()
 
 file(GLOB SOURCE_FILES *.cpp)
 
+if (WIN32)
+    set(EXTRA_LIBS iphlpapi WS2_32)
+endif()
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Window")
   set(WSLIB -lws2_32)
 else ()
@@ -15,5 +19,5 @@ else ()
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS} ${PTHREAD_LIBRARIES} ${WSLIB})
+target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS} ${PTHREAD_LIBRARIES} ${WSLIB} ${EXTRA_LIBS})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
