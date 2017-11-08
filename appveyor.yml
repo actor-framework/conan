@@ -5,21 +5,11 @@ environment:
     PYTHON_VERSION: "2.7.8"
     PYTHON_ARCH: "32"
 
-    CONAN_REFERENCE: "caf/0.15.5"
-    CONAN_USERNAME: "actor-framework"
-    CONAN_LOGIN_USERNAME: "sourcedelica"
-    CONAN_CHANNEL: "stable"
-    VS150COMNTOOLS: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\"
-    CONAN_UPLOAD: "https://api.bintray.com/conan/actor-framework/actor-framework"
-    CONAN_ARCHS: "x86_64"
-
-    # Note: CAF supports >= VS 2015 Update 3
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CONAN_VISUAL_VERSIONS: 14
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           CONAN_VISUAL_VERSIONS: 15
-
 
 install:
   - set PATH=%PATH%;%PYTHON%/Scripts/

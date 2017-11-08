@@ -1,2 +1,0 @@
-def system():
-    return 'Linux'

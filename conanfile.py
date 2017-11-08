@@ -5,15 +5,8 @@ from conans.errors import ConanException
 
 
 class CAFConan(ConanFile):
-    # Note: if you change this version, also update .travis.yml and appveyor.yml
-    version = '0.15.5'
-
-    git_version = version
-    git_user = 'actor-framework'
-
-    source_dir = 'actor-framework-%s' % git_version
-
     name = 'caf'
+    version = '0.15.5'
     description = 'An open source implementation of the Actor Model in C++'
     url = 'http://actor-framework.org'
     license = 'BSD-3-Clause'
@@ -21,8 +14,15 @@ class CAFConan(ConanFile):
     options = {'shared': [True, False], 'static': [True, False],
                'log_level': ['NONE', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'TRACE']}
     default_options = 'shared=False', 'static=True', 'log_level=NONE'
-    generators = 'cmake'
 
+    def source(self):
+        project_url = 'https://github.com/actor-framework/actor-framework'
+        archive_path = "/archive/"
+        archive_ext = ".tar.gz"
+        download_url = project_url + archive_path + self.version + archive_ext
+        tools.get(download_url)
+        os.rename("actor-framework-" + self.version, "sources")
+        
     def configure(self):
         if self.settings.compiler == 'gcc':
             if self.settings.compiler.version < 4.8:
@@ -47,51 +47,39 @@ class CAFConan(ConanFile):
             libcxx = 'libstdc++11' if 'with-default-libstdcxx-abi=new' in err else 'libstdc++'
         return libcxx
 
-    def source(self):
-        git_url = 'https://github.com/%s/actor-framework/archive/%s.zip' % (self.git_user, self.git_version)
-        zip_filename = '%s.zip' % self.git_version
-        tools.download(git_url, zip_filename)
-        tools.unzip(zip_filename)
-
     def build(self):
-        build_dir = '%s/build' % self.source_dir
-        if not os.path.exists(build_dir):
-            os.mkdir(build_dir)
+        with tools.chdir("sources"):
+            build_dir = "build"
+            if not os.path.exists(build_dir):
+                os.mkdir(build_dir)
 
-        conan_magic_lines = '''project(caf C CXX)
-        include(../conanbuildinfo.cmake)
-        conan_basic_setup()
-        '''
-        cmake_file = '%s/CMakeLists.txt' % self.source_dir
-        tools.replace_in_file(cmake_file, 'project(caf C CXX)', conan_magic_lines)
+            cmake = CMake(self)
+            cmake.parallel = True
+            cmake.definitions['CMAKE_CXX_STANDARD'] = '11'
+            if tools.os_info.is_windows or self.settings.arch == 'x86':
+                cmake.definitions['CAF_NO_OPENSSL'] = 'ON'
+            for define in ['CAF_NO_EXAMPLES', 'CAF_NO_TOOLS', 'CAF_NO_UNIT_TESTS', 'CAF_NO_PYTHON']:
+                cmake.definitions[define] = 'ON'
+            if tools.os_info.is_macos and self.settings.arch == 'x86':
+                cmake.definitions['CMAKE_OSX_ARCHITECTURES'] = 'i386'
+            if self.options.static:
+                static_def = 'CAF_BUILD_STATIC' if self.options.shared else 'CAF_BUILD_STATIC_ONLY'
+                cmake.definitions[static_def] = 'ON'
+            if self.options.log_level and self.options.log_level != 'NONE':
+                cmake.definitions['CAF_LOG_LEVEL'] = self.options.log_level
 
-        cmake = CMake(self)
-        cmake.parallel = True
-        cmake.definitions['CMAKE_CXX_STANDARD'] = '11'
-        if tools.os_info.is_windows or self.settings.arch == 'x86':
-            cmake.definitions['CAF_NO_OPENSSL'] = 'ON'
-        for define in ['CAF_NO_EXAMPLES', 'CAF_NO_TOOLS', 'CAF_NO_UNIT_TESTS', 'CAF_NO_PYTHON']:
-            cmake.definitions[define] = 'ON'
-        if tools.os_info.is_macos and self.settings.arch == 'x86':
-            cmake.definitions['CMAKE_OSX_ARCHITECTURES'] = 'i386'
-        if self.options.static:
-            static_def = 'CAF_BUILD_STATIC' if self.options.shared else 'CAF_BUILD_STATIC_ONLY'
-            cmake.definitions[static_def] = 'ON'
-        if self.options.log_level and self.options.log_level != 'NONE':
-            cmake.definitions['CAF_LOG_LEVEL'] = self.options.log_level
-
-        cmake.configure(source_dir=self.source_dir)
-
-        cmake.build()
+            cmake.configure(source_dir="sources")
+            cmake.build()
 
     def package(self):
-        self.copy('*.hpp',    dst='include/caf', src='%s/libcaf_core/caf' % self.source_dir)
-        self.copy('*.hpp',    dst='include/caf', src='%s/libcaf_io/caf' % self.source_dir)
-        self.copy('*.dylib',  dst='lib',         src='lib')
-        self.copy('*.so',     dst='lib',         src='lib')
-        self.copy('*.so.*',   dst='lib',         src='lib')
-        self.copy('*.a',      dst='lib',         src='lib')
-        self.copy('*.lib',    dst='lib',         src='lib')
+        caf_include_dir = os.path.join('include','caf')
+        self.copy('*.hpp',    dst=caf_include_dir,  src=os.path.join("sources", 'libcaf_core', 'caf'))
+        self.copy('*.hpp',    dst=caf_include_dir,  src=os.path.join("sources", 'libcaf_io', 'caf'))
+        self.copy('*.dylib',  dst='lib',                    src='lib')
+        self.copy('*.so',     dst='lib',                    src='lib')
+        self.copy('*.so.*',  dst='lib',                    src='lib')
+        self.copy('*.a',      dst='lib',                    src='lib')
+        self.copy('*.lib',    dst='lib',                    src='lib')
         self.copy('license*', dst='licenses',    ignore_case=True, keep_path=False)
 
     def package_info(self):

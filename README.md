@@ -1,8 +1,10 @@
 # [Conan](http://conan.io) recipe for [CAF](http://actor-framework.org)
 
+[ ![Download](https://api.bintray.com/packages/bincrafters/public-conan/caf%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/caf%3Abincrafters/_latestVersion)
+
 |Platform|Build Status|
 |:----|:----|
-|Linux|[![Travis Build Status](https://travis-ci.org/sourcedelica/conan-caf.svg?branch=0.15.5-upgrade)](https://travis-ci.org/sourcedelica/conan-caf)|
+|Linux|[![Travis Build Status](https://travis-ci.org/bincrafters/conan-caf.svg?branch=0.15.5-upgrade)](https://travis-ci.org/sourcedelica/conan-caf)|
 |Windows|[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/8qdaau0pxfn3g58o/branch/0.15.5-upgrade?svg=true)](https://ci.appveyor.com/project/sourcedelica/conan-caf/branch/bintray_setup)|
 
 ## Setup

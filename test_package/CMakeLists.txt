@@ -1,25 +1,19 @@
-project(CAFReusePackage)
-cmake_minimum_required(VERSION 3.5.1)
+project(test_package)
+cmake_minimum_required(VERSION 2.8.11)
 
-set(CMAKE_CXX_STANDARD 11)
-
-if(NOT APPLE AND NOT WIN32)
-    set(EXTRA_FLAGS "-pthread")
-endif()
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
+conan_basic_setup()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}")
+file(GLOB SOURCE_FILES *.cpp)
 
-if (WIN32)
-    set(EXTRA_LIBS iphlpapi WS2_32)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Window")
+  set(WSLIB -lws2_32)
+else ()
+  set(WSLIB)
 endif()
 
-add_executable(caf-test
-             tests/libcaf_io/test/basp.cpp
-             tests/libcaf_test/src/caf-test.cpp)
-
-target_include_directories(caf-test PUBLIC tests/libcaf_test)
-
-target_link_libraries(caf-test CONAN_PKG::caf ${EXTRA_LIBS})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS} ${PTHREAD_LIBRARIES} ${WSLIB})
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
