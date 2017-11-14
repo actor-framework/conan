@@ -1,86 +1,50 @@
-# [Conan](http://conan.io) recipe for [CAF](http://actor-framework.org)
+[![Download](https://api.bintray.com/packages/bincrafters/public-conan/caf%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/caf%3Abincrafters/_latestVersion)
+[![Build Status](https://travis-ci.org/bincrafters/conan-caf.svg?branch=stable%2F0.15.5)](https://travis-ci.org/bincrafters/conan-caf)
+[![Build status](https://ci.appveyor.com/api/projects/status/sxs9n6vb8nqa92l5?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-caf)
 
-[ ![Download](https://api.bintray.com/packages/bincrafters/public-conan/caf%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/caf%3Abincrafters/_latestVersion)
+[Conan.io](https://conan.io) package for [caf](https://github.com/someauthor/caf) project
 
-|Platform|Build Status|
-|:----|:----|
-|Linux|[![Travis Build Status](https://travis-ci.org/bincrafters/conan-caf.svg?branch=0.15.5-upgrade)](https://travis-ci.org/sourcedelica/conan-caf)|
-|Windows|[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/8qdaau0pxfn3g58o/branch/0.15.5-upgrade?svg=true)](https://ci.appveyor.com/project/sourcedelica/conan-caf/branch/bintray_setup)|
+The packages generated with this **conanfile** can be found in [Bintray](https://bintray.com/bincrafters/public-conan/caf%3Abincrafters).
 
-## Setup
+## For Users: Use this package
 
-### Conan
-```
-pip install conan
-```
+### Basic setup
 
-## Usage
+    $ conan install caf/0.15.5@bincrafters/stable
 
-Add a requirement for `caf/0.15.5@actor-framework/stable`
-to your `conanfile.txt` or `conanfile.py`.
+### Project setup
 
-### Build Options
+If you handle multiple dependencies in your project is better to add a *conanfile.txt*
 
-There are a number of CAF-specific options which are activated
-using `caf:option=value`:
+    [requires]
+    caf/0.15.5@bincrafters/stable
 
-|Option     |Values                             |Default  |Description             |
-|:----------|:----------------------------------|:--------|:-----------------------|
-|`shared`   |`True`, `False`                    | `False` | Build shared libraries |
-|`static`   |`True`, `False`                    | `True`  | Build static libraries |
-|`log_level`|`ERROR`, `WARNING`, `INFO`, `DEBUG`| None    | Build with logging     |
+    [generators]
+    txt
 
-For example, to use shared libraries and debug logging for CAF, use:
-```
-conan install -o caf:shared=True -o caf:log_level=DEBUG
-```
+Complete the installation of requirements for your project running:
 
-Conan keeps track of the option values used and each built combination of
-options is a different package.
+    $ mkdir build && cd build && conan install ..
 
-### GCC 5.1+
+Note: It is recommended that you run conan install from a build directory and not the root of the project directory.  This is because conan generates *conanbuildinfo* files specific to a single build configuration which by default comes from an autodetected default profile located in ~/.conan/profiles/default .  If you pass different build configuration options to conan install, it will generate different *conanbuildinfo* files.  Thus, they should not be added to the root of the project, nor committed to git.
 
-CAF compiles with the default C++ ABI.
+## For Packagers: Publish this Package
 
-Verify which version of the C++ ABI your compiler is using by default:
+The example below shows the commands used to publish to bincrafters conan repository. To publish to your own conan respository (for example, after forking this git repository), you will need to change the commands below accordingly.
 
-```
-g++ --version -v 2>&1 | grep with-default-libstdcxx-abi
-```
+## Build and package
 
-Edit `~/.conan/conan.conf` and change `compiler.libcxx` depending on the
-value of `--with-default-libstdcxx-abi`:
+The following command both runs all the steps of the conan file, and publishes the package to the local system cache.  This includes downloading dependencies from "build_requires" and "requires" , and then running the build() method.
 
-| ABI value | Conan `compiler.libcxx` |
-|:----------|:------------------------|
-| `new`     | `libstdc++11`           |
-| `old`     | `libstdc++`             |
+    $ conan create bincrafters/stable
 
-You may need to run the `conan` command once to generate it.
+## Add Remote
 
-## Development
+    $ conan remote add bincrafters "https://api.bintray.com/conan/bincrafters/public-conan"
 
-### Testing a new version of the package
+## Upload
 
-1. Edit the following files and and change the version to the new
-   version number:
-   1. `conanfile.py`
-   2. `.travis.yml`
-   3. `appveyor.yml`
-2. Run `conan create`
- 
-The syntax for `conan create` is
-```
-conan create actor-framework/stable [-o caf:option=value]...
-```
+    $ conan upload caf/0.15.5@bincrafters/stable --all -r bincrafters
 
-`conan create` will build CAF and install the package in your local
-Conan cache under `~/.conan/data`.  It will also run a smoke test
-against the package.
-
-
-### Continuous Integration
-
-Travis and Appveyor are set up to build packages for a number of
-configurations.  See `.travis.yml`, `appveyor.yml` and `build.py`
-for details.
+## License
+[BSD](LICENSE_BSD) or [Boost](LICENSE_BOOST)
