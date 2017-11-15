@@ -9,10 +9,10 @@ def get_value_from_recipe(search_string):
     return result
 
 def get_name_from_recipe():
-    return get_value_from_recipe(r'name\s*=\s*"(\S*)"').groups()[0]
+    return get_value_from_recipe(r'''name\s*=\s*["'](\S*)["']''').groups()[0]
 
 def get_version_from_recipe():
-    return get_value_from_recipe(r'version\s*=\s*"(\S*)"').groups()[0]
+    return get_value_from_recipe(r'''version\s*=\s*["'](\S*)["']''').groups()[0]
 
 def get_default_vars():
     username = os.getenv("CONAN_USERNAME", "bincrafters")
@@ -55,5 +55,5 @@ if __name__ == "__main__":
         upload_only_when_stable=True, 
         stable_branch_pattern="stable/*")
         
-    builder.add_common_builds()
+    builder.add_common_builds(shared_option_name=name + ":shared")
     builder.run()
