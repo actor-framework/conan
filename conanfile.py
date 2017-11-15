@@ -87,6 +87,11 @@ class CAFConan(ConanFile):
     def package_info(self):
         tools.collect_libs(self)
         
+        if self.options.shared:
+            self.cpp_info.libs.extend(["caf_io", "caf_core"])
+        if not self.options.shared:
+            self.cpp_info.libs.extend(["caf_io_static", "caf_core_static"])
+
         if self.settings.os == "Windows":
             if not self.options.shared:
                 self.cpp_info.libs.append('ws2_32')
@@ -94,7 +99,3 @@ class CAFConan(ConanFile):
         elif self.settings.os == "Linux":
             self.cpp_info.libs.append('pthread')
 
-        if self.options.shared:
-            self.cpp_info.libs.extend(["caf_io", "caf_core"])
-        if not self.options.shared:
-            self.cpp_info.libs.extend(["caf_io_static", "caf_core_static"])
