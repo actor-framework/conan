@@ -1,6 +1,6 @@
 [![Download](https://api.bintray.com/packages/bincrafters/public-conan/caf%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/caf%3Abincrafters/_latestVersion)
 [![Build Status](https://travis-ci.org/bincrafters/conan-caf.svg?branch=stable%2F0.15.5)](https://travis-ci.org/bincrafters/conan-caf)
-[![Build status](https://ci.appveyor.com/api/projects/status/sxs9n6vb8nqa92l5?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-caf)
+[![Build status](https://ci.appveyor.com/api/projects/status/pnxuw62rla36e0d9?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-caf)
 
 [Conan.io](https://conan.io) package for [caf](https://github.com/someauthor/caf) project
 

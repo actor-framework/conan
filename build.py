@@ -54,6 +54,12 @@ if __name__ == "__main__":
         remotes=upload, #while redundant, this moves bincrafters remote to position 0
         upload_only_when_stable=True, 
         stable_branch_pattern="stable/*")
+    
+    if get_os() == "Windows":
+        builder.add_common_builds() 
+        # shared libs not currently supported on windows
+        #https://github.com/actor-framework/actor-framework/blob/master/CMakeLists.txt#L15
+    else:
+        builder.add_common_builds(shared_option_name=name + ":shared")
         
-    builder.add_common_builds(shared_option_name=name + ":shared")
     builder.run()

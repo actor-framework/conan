@@ -60,8 +60,12 @@ class CAFConan(ConanFile):
             cmake.definitions[define] = "ON"
         if tools.os_info.is_macos and self.settings.arch == "x86":
             cmake.definitions["CMAKE_OSX_ARCHITECTURES"] = "i386"
-        if not self.options.shared:
+        if self.options.shared:
+            cmake.definitions["CAF_BUILD_STATIC"] = "OFF"
+            cmake.definitions["CAF_BUILD_STATIC_ONLY"] = "OFF"
+        else:
             cmake.definitions["CAF_BUILD_STATIC"] = "ON"
+            cmake.definitions["CAF_BUILD_STATIC_ONLY"] = "ON"
         if self.options.log_level and self.options.log_level != "NONE":
             cmake.definitions["CAF_LOG_LEVEL"] = self.options.log_level
 
