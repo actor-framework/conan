@@ -13,10 +13,12 @@ class CAFConan(ConanFile):
     description = "An open source implementation of the Actor Model in C++"
     url = "http://actor-framework.org"
     license = "BSD-3-Clause"
+    exports = ["CMakeLists.txt"]
+    generators = ["cmake"]
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "static": [True, False],
+    options = {"shared": [True, False], 
                "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]}
-    default_options = "shared=False", "static=True", "log_level=NONE"
+    default_options = "shared=False", "log_level=NONE"
 
     def source(self):
         project_url = "https://github.com/actor-framework/actor-framework"
@@ -38,8 +40,6 @@ class CAFConan(ConanFile):
             raise ConanException("clang >= 3.4 is required, yours is %s" % self.settings.compiler.version)
         if self.settings.compiler == "Visual Studio" and str(self.settings.compiler.version) < "14":
             raise ConanException("Visual Studio >= 14 is required, yours is %s" % self.settings.compiler.version)
-        if not (self.options.shared or self.options.static):
-            raise ConanException("You must use at least one of shared=True or static=True")
 
     def _gcc_libcxx(self):
         if self.settings.compiler.version < 5:
@@ -51,43 +51,46 @@ class CAFConan(ConanFile):
         return libcxx
 
     def build(self):
-        with tools.chdir("sources"):
-            build_dir = "build"
-            if not os.path.exists(build_dir):
-                os.mkdir(build_dir)
+        cmake = CMake(self)
+        cmake.parallel = True
+        cmake.definitions["CMAKE_CXX_STANDARD"] = "11"
+        if tools.os_info.is_windows or self.settings.arch == "x86":
+            cmake.definitions["CAF_NO_OPENSSL"] = "ON"
+        for define in ["CAF_NO_EXAMPLES", "CAF_NO_TOOLS", "CAF_NO_UNIT_TESTS", "CAF_NO_PYTHON"]:
+            cmake.definitions[define] = "ON"
+        if tools.os_info.is_macos and self.settings.arch == "x86":
+            cmake.definitions["CMAKE_OSX_ARCHITECTURES"] = "i386"
+        if not self.options.shared:
+            cmake.definitions["CAF_BUILD_STATIC"] = "ON"
+        if self.options.log_level and self.options.log_level != "NONE":
+            cmake.definitions["CAF_LOG_LEVEL"] = self.options.log_level
 
-            cmake = CMake(self)
-            cmake.parallel = True
-            cmake.definitions["CMAKE_CXX_STANDARD"] = "11"
-            if tools.os_info.is_windows or self.settings.arch == "x86":
-                cmake.definitions["CAF_NO_OPENSSL"] = "ON"
-            for define in ["CAF_NO_EXAMPLES", "CAF_NO_TOOLS", "CAF_NO_UNIT_TESTS", "CAF_NO_PYTHON"]:
-                cmake.definitions[define] = "ON"
-            if tools.os_info.is_macos and self.settings.arch == "x86":
-                cmake.definitions["CMAKE_OSX_ARCHITECTURES"] = "i386"
-            if self.options.static:
-                static_def = "CAF_BUILD_STATIC" if self.options.shared else "CAF_BUILD_STATIC_ONLY"
-                cmake.definitions[static_def] = "ON"
-            if self.options.log_level and self.options.log_level != "NONE":
-                cmake.definitions["CAF_LOG_LEVEL"] = self.options.log_level
-
-            cmake.configure(source_dir="sources")
-            cmake.build()
+        cmake.configure(build_dir="build")
+        cmake.build()
 
     def package(self):
         caf_include_dir = os.path.join("include","caf")
+        self.copy("license*", dst="licenses",  ignore_case=True, keep_path=False)
         self.copy("*.hpp",    dst=caf_include_dir,  src=os.path.join("sources", "libcaf_core", "caf"))
         self.copy("*.hpp",    dst=caf_include_dir,  src=os.path.join("sources", "libcaf_io", "caf"))
-        self.copy("*.dylib",  dst="lib",                    src="lib")
-        self.copy("*.so",     dst="lib",                    src="lib")
-        self.copy("*.so.*",  dst="lib",                    src="lib")
-        self.copy("*.a",      dst="lib",                    src="lib")
-        self.copy("*.lib",    dst="lib",                    src="lib")
-        self.copy("license*", dst="licenses",    ignore_case=True, keep_path=False)
+        self.copy("*.dylib",  dst="lib", keep_path=False)
+        self.copy("*.so",     dst="lib", keep_path=False)
+        self.copy("*.so.*",  dst="lib", keep_path=False)
+        self.copy("*.a",      dst="lib", keep_path=False)
+        self.copy("*.lib",    dst="lib", keep_path=False)
+        self.copy("*.dll",    dst="bin", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = []
+        tools.collect_libs(self)
+        
+        if self.settings.os == "Windows":
+            if not self.options.shared:
+                self.cpp_info.libs.append('ws2_32')
+                self.cpp_info.libs.append('iphlpapi')
+        elif self.settings.os == "Linux":
+            self.cpp_info.libs.append('pthread')
+
         if self.options.shared:
             self.cpp_info.libs.extend(["caf_io", "caf_core"])
-        if self.options.static:
+        if not self.options.shared:
             self.cpp_info.libs.extend(["caf_io_static", "caf_core_static"])

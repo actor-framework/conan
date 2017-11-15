@@ -8,17 +8,6 @@ conan_basic_setup()
 
 file(GLOB SOURCE_FILES *.cpp)
 
-if(NOT APPLE AND NOT WIN32)
-    set(EXTRA_FLAGS "-pthread")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}")
-
-if (WIN32)
-    set(EXTRA_LIBS iphlpapi WS2_32)
-endif()
-
-
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS} ${PTHREAD_LIBRARIES} ${EXTRA_LIBS})
+target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
