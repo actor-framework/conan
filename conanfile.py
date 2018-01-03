@@ -12,12 +12,16 @@ class CAFConan(ConanFile):
     version = "0.15.5"
     description = "An open source implementation of the Actor Model in C++"
     url = "http://actor-framework.org"
-    license = "BSD-3-Clause"
-    exports = ["CMakeLists.txt"]
+    license = "BSD-3-Clause, BSL-1.0"
+    exports = ["LICENSE.md"]
+    exports_sources = ["CMakeLists.txt"]
     generators = ["cmake"]
+    source_subfolder = "source_subfolder"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], 
-               "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]}
+    options = {
+        "shared": [True, False], 
+        "log_level": ["NONE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]
+   }
     default_options = "shared=False", "log_level=NONE"
 
     def source(self):
@@ -26,7 +30,7 @@ class CAFConan(ConanFile):
         archive_ext = ".tar.gz"
         download_url = project_url + archive_path + self.version + archive_ext
         tools.get(download_url)
-        os.rename("actor-framework-" + self.version, "sources")
+        os.rename("actor-framework-" + self.version, self.source_subfolder)
         
     def configure(self):
         if self.settings.compiler == "gcc":
@@ -73,10 +77,10 @@ class CAFConan(ConanFile):
         cmake.build()
 
     def package(self):
-        caf_include_dir = os.path.join("include","caf")
-        self.copy("license*", dst="licenses",  ignore_case=True, keep_path=False)
-        self.copy("*.hpp",    dst=caf_include_dir,  src=os.path.join("sources", "libcaf_core", "caf"))
-        self.copy("*.hpp",    dst=caf_include_dir,  src=os.path.join("sources", "libcaf_io", "caf"))
+        dst_include_dir = os.path.join("include","caf")
+        self.copy("LICENSE*", src=self.source_subfolder)
+        self.copy("*.hpp",    dst=dst_include_dir,  src=os.path.join(self.source_subfolder, "libcaf_core", "caf"))
+        self.copy("*.hpp",    dst=dst_include_dir,  src=os.path.join(self.source_subfolder, "libcaf_io", "caf"))
         self.copy("*.dylib",  dst="lib", keep_path=False)
         self.copy("*.so",     dst="lib", keep_path=False)
         self.copy("*.so.*",  dst="lib", keep_path=False)
