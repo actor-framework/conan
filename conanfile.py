@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import subprocess
 from conans import ConanFile, CMake, tools
 from conans.errors import ConanException
 
@@ -36,23 +35,10 @@ class CAFConan(ConanFile):
         if self.settings.compiler == "gcc":
             if self.settings.compiler.version < 4.8:
                 raise ConanException("g++ >= 4.8 is required, yours is %s" % self.settings.compiler.version)
-            else:
-                # This is temporary until support is in CAF for standard lib configuration
-                # https://github.com/actor-framework/actor-framework/issues/597
-                self.settings.compiler.libcxx = self._gcc_libcxx()
         if self.settings.compiler == "clang" and str(self.settings.compiler.version) < "3.4":
             raise ConanException("clang >= 3.4 is required, yours is %s" % self.settings.compiler.version)
         if self.settings.compiler == "Visual Studio" and str(self.settings.compiler.version) < "14":
             raise ConanException("Visual Studio >= 14 is required, yours is %s" % self.settings.compiler.version)
-
-    def _gcc_libcxx(self):
-        if self.settings.compiler.version < 5:
-            libcxx = "libstdc++"
-        else:
-            process = subprocess.Popen(["g++", "--version", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            _, err = process.communicate()
-            libcxx = "libstdc++11" if "with-default-libstdcxx-abi=new" in err else "libstdc++"
-        return libcxx
 
     def build(self):
         cmake = CMake(self)
