@@ -10,12 +10,14 @@ class CAFConan(ConanFile):
     name = "caf"
     version = "0.15.5"
     description = "An open source implementation of the Actor Model in C++"
-    url = "https://github.com/actor-framework/actor-framework"
+    url = "https://github.com/bincrafters/conan-caf"
+    homepage = "https://github.com/actor-framework/actor-framework"
     license = "BSD-3-Clause, BSL-1.0"
     exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
     generators = ["cmake"]
     source_subfolder = "source_subfolder"
+    build_subfolder = "build_subfolder"
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "shared": [True, False], 
@@ -59,14 +61,16 @@ class CAFConan(ConanFile):
         if self.options.log_level and self.options.log_level != "NONE":
             cmake.definitions["CAF_LOG_LEVEL"] = self.options.log_level
 
-        cmake.configure(build_dir="build")
+        cmake.configure(build_dir=self.build_subfolder)
         cmake.build()
 
     def package(self):
-        dst_include_dir = os.path.join("include", "caf")
-        self.copy("LICENSE*", src=self.source_subfolder)
-        self.copy("*.hpp",    dst=dst_include_dir,  src=os.path.join(self.source_subfolder, "libcaf_core", "caf"))
-        self.copy("*.hpp",    dst=dst_include_dir,  src=os.path.join(self.source_subfolder, "libcaf_io", "caf"))
+        cmake = CMake(self)
+        cmake.install()
+        
+        self.copy("LICENSE*", dst="licenses", src=self.source_subfolder)
+        
+        # Only headers are copied by cmake.install()
         self.copy("*.dylib",  dst="lib", keep_path=False)
         self.copy("*.so",     dst="lib", keep_path=False)
         self.copy("*.so.*",  dst="lib", keep_path=False)

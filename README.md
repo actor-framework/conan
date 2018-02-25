@@ -1,7 +1,7 @@
 ## Package Status
 
-| Bintray | Appveyor | Travis |
-|---------|-----------|--------|
+| Bintray | Windows | Linux & macOS | 
+|:--------:|:---------:|:-----------------:|
 |[![Download](https://api.bintray.com/packages/bincrafters/public-conan/caf%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/caf%3Abincrafters/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-caf?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-caf)|[![Build Status](https://travis-ci.org/bincrafters/conan-caf.svg)](https://travis-ci.org/bincrafters/conan-caf)|
 
 ## Conan.io Information
