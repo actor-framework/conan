@@ -1,4 +1,6 @@
 .idea/
+linux-packager.sh
+windows-packager.bat
 __pycache__/
 **/*.pyc
 build/
