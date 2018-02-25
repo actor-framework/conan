@@ -1,33 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 
-from bincrafters import build_template_default, build_shared
+from bincrafters import build_template_default
+import platform
+
 
 if __name__ == "__main__":
-
     builder = build_template_default.get_builder()
 
     filtered_builds = []
-    compilers = set()
-    filtered_builds = []
 
     for settings, options, env_vars, build_requires in builder.builds:
-        compiler = settings['compiler']
-        if compiler == 'gcc':
-            version = settings['compiler.version']
-            libstdcxx = 'libstdc++11' if version >= '5.1' else 'libstdc++'
-            settings['compiler.libcxx'] = libstdcxx
-        elif compiler == 'clang':
-            settings['compiler.libcxx'] = 'libc++'
-
-        if build_shared.get_os() != 'Windows' or settings['compiler.runtime'] in {'MD', 'MDd'}:
+        # The CAF build does not support shared on Windows or shared on x86
+        if options['caf:shared']:
+            if settings['arch'] != 'x86' and platform.system() != 'Windows':
+                filtered_builds.append([settings, options, env_vars, build_requires])
+        else:
             filtered_builds.append([settings, options, env_vars, build_requires])
-
-        # Add one shared library build per x86_64 compiler (except Windows)
-        if build_shared.get_os() != 'Windows' and settings['arch'] == 'x86_64' and compiler not in compilers:
-            filtered_builds.append([settings, {'caf:shared': True}, env_vars, build_requires])
-            compilers.add(compiler)
 
     builder.builds = filtered_builds
 

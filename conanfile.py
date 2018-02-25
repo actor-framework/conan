@@ -10,7 +10,7 @@ class CAFConan(ConanFile):
     name = "caf"
     version = "0.15.5"
     description = "An open source implementation of the Actor Model in C++"
-    url = "http://actor-framework.org"
+    url = "https://github.com/actor-framework/actor-framework"
     license = "BSD-3-Clause, BSL-1.0"
     exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
@@ -44,7 +44,7 @@ class CAFConan(ConanFile):
         cmake = CMake(self)
         cmake.parallel = True
         cmake.definitions["CMAKE_CXX_STANDARD"] = "11"
-        if tools.os_info.is_windows or self.settings.arch == "x86":
+        if self.settings.compiler=="Visual Studio" or self.settings.arch == "x86":
             cmake.definitions["CAF_NO_OPENSSL"] = "ON"
         for define in ["CAF_NO_EXAMPLES", "CAF_NO_TOOLS", "CAF_NO_UNIT_TESTS", "CAF_NO_PYTHON"]:
             cmake.definitions[define] = "ON"
@@ -63,7 +63,7 @@ class CAFConan(ConanFile):
         cmake.build()
 
     def package(self):
-        dst_include_dir = os.path.join("include","caf")
+        dst_include_dir = os.path.join("include", "caf")
         self.copy("LICENSE*", src=self.source_subfolder)
         self.copy("*.hpp",    dst=dst_include_dir,  src=os.path.join(self.source_subfolder, "libcaf_core", "caf"))
         self.copy("*.hpp",    dst=dst_include_dir,  src=os.path.join(self.source_subfolder, "libcaf_io", "caf"))
@@ -82,7 +82,7 @@ class CAFConan(ConanFile):
         if not self.options.shared:
             self.cpp_info.libs.extend(["caf_io_static", "caf_core_static"])
 
-        if self.settings.os == "Windows":
+        if self.settings.compiler=="Visual Studio":
             if not self.options.shared:
                 self.cpp_info.libs.append('ws2_32')
                 self.cpp_info.libs.append('iphlpapi')
