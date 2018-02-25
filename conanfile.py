@@ -66,6 +66,7 @@ class CAFConan(ConanFile):
 
     def package(self):
         cmake = CMake(self)
+        cmake.configure(build_dir=self.build_subfolder)
         cmake.install()
         
         self.copy("LICENSE*", dst="licenses", src=self.source_subfolder)
