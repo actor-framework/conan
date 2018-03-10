@@ -35,7 +35,7 @@ class CAFConan(ConanFile):
         
     def configure(self):
         if self.settings.compiler == "gcc":
-            if self.settings.compiler.version < 4.8:
+            if str(self.settings.compiler.version) < "4.8":
                 raise ConanException("g++ >= 4.8 is required, yours is %s" % self.settings.compiler.version)
         if self.settings.compiler == "clang" and str(self.settings.compiler.version) < "3.4":
             raise ConanException("clang >= 3.4 is required, yours is %s" % self.settings.compiler.version)
