@@ -4,11 +4,12 @@
 import os
 from conans import ConanFile, CMake, tools
 from conans.errors import ConanException
+from conans.model.version import Version
 
 
 class CAFConan(ConanFile):
     name = "caf"
-    version = "0.15.6"
+    version = "0.15.7"
     description = "An open source implementation of the Actor Model in C++"
     url = "https://github.com/bincrafters/conan-caf"
     homepage = "https://github.com/actor-framework/actor-framework"
@@ -35,11 +36,11 @@ class CAFConan(ConanFile):
         
     def configure(self):
         if self.settings.compiler == "gcc":
-            if str(self.settings.compiler.version) < "4.8":
+            if Version(self.settings.compiler.version.value) < "4.8":
                 raise ConanException("g++ >= 4.8 is required, yours is %s" % self.settings.compiler.version)
-        if self.settings.compiler == "clang" and str(self.settings.compiler.version) < "3.4":
+        if self.settings.compiler == "clang" and Version(self.settings.compiler.version.value) < "3.4":
             raise ConanException("clang >= 3.4 is required, yours is %s" % self.settings.compiler.version)
-        if self.settings.compiler == "Visual Studio" and str(self.settings.compiler.version) < "14":
+        if self.settings.compiler == "Visual Studio" and Version(self.settings.compiler.version.value) < "14":
             raise ConanException("Visual Studio >= 14 is required, yours is %s" % self.settings.compiler.version)
 
     def build(self):
